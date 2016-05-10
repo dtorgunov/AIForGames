@@ -89,6 +89,20 @@ namespace GridWorld
             return aliveEnemyCount == 1;
         }
 
+        private GridSquare[,] fromLocalMap()
+        {
+            GridSquare[,] gs = new GridSquare[localMap.GetLength(0),localMap.GetLength(1)];
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    gs[x,y] = convertFromCell(localMap[x, y], x, y);
+                }
+            }
+
+            return gs;
+        }
+
         // Actions
 
         public ICommand moveUp()
@@ -193,6 +207,28 @@ namespace GridWorld
             }
         }
 
+        private GridSquare convertFromCell(Cell c, int x, int y)
+        {
+            switch (c)
+            {
+                case Cell.Empty:
+                    return new GridSquare(x, y, GridSquare.ContentType.Empty);
+                case Cell.Destroyed:
+                    return new GridSquare(x, y, GridSquare.ContentType.DestroyedTank);
+                case Cell.Rock:
+                    return new GridSquare(x, y, GridSquare.ContentType.Rock);
+                case Cell.Hero:
+                case Cell.Enemy1:
+                case Cell.Enemy2:
+                case Cell.Enemy3:
+                    return unresolveTank(x, y);
+                case Cell.Unexplored:
+                    return new GridSquare(x, y); // assume "empty"
+                default:
+                    return null;
+            }
+        }
+
         private Cell resolveTank(GridSquare s)
         {
             // assuming it's not us, or we wouldn't be here
@@ -241,6 +277,21 @@ namespace GridWorld
                     return Cell.Enemy3;
                 }
             }            
+        }
+
+        private GridSquare unresolveTank(int x, int y)
+        {
+            List<GridSquare> visible = worldState.MyVisibleSquares;
+            foreach (GridSquare square in visible)
+            {
+                if (square.X == x && square.Y == y)
+                {
+                    return square;
+                }
+            }
+
+            // tanks only matter when we can see them
+            return new GridSquare(x, y, GridSquare.ContentType.Empty);
         }
 
         class SubsumptionDispatch
