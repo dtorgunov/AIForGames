@@ -38,12 +38,31 @@ namespace GridWorld
             int mapWidth = localMap.GetLength(0);
             int mapHeigth = localMap.GetLength(1);
 
-            List<Cell> obs = MapObs(1);
+            int searchSize = 1;
+            List<Cell> obs = MapObs(searchSize);
+
+            while(obs.Count == 0) 
+            {
+                if (searchSize < 3)
+                {
+                    searchSize++;
+                    obs = MapObs(searchSize);
+                }
+                else
+                {
+                    return RandomDodge(mapWidth, mapHeigth, threat);
+                }
+            }
 
             //Base case. Should never be reached.
             return RandomDodge(mapWidth, mapHeigth, threat);
         }
 
+        /// <summary>
+        /// Maps the obstacles surronding the player.
+        /// </summary>
+        /// <param name="size">How far away from the player to go.</param>
+        /// <returns>A list of the nearby obstacles.</returns>
         private List<Cell> MapObs(int size)
         {
             List<Cell> obs = new List<Cell>();
