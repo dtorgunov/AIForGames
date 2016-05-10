@@ -7,7 +7,15 @@ namespace GridWorld
 {
     class MightyPathFinder
     {
+        GridNode[,] gridNodeBoardArray;
+        PlayerWorldState myworld;
 
+        enum tiles {Empty,Rock,Hero,Enemy,Rubble,Unexplored};
+
+        public MightyPathFinder(PlayerWorldState p)
+        {
+            this.myworld = p;
+        }
 
         public void ConvertToGridNodeArray(PlayerWorldState p)
         {
