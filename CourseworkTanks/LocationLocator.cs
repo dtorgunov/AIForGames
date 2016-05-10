@@ -202,6 +202,62 @@ namespace GridWorld
             return RandomKnown(w, h);
         }
 
+        public Command Attack(GridSquare threat, PlayerWorldState.Facing facing) 
+        {
+            if (hero.X == threat.X)
+            {
+                if (hero.Y > threat.Y)
+                {
+                    if (facing == PlayerWorldState.Facing.Down)
+                        return new Command(Command.Move.Down, true);
+                    else if (facing == PlayerWorldState.Facing.Right)
+                        return new Command(Command.Move.RotateRight, true);
+                    else if (facing == PlayerWorldState.Facing.Left)
+                        return new Command(Command.Move.RotateLeft, true);
+                    else
+                        return new Command(Command.Move.RotateLeft, false);
+                }
+                else if (hero.Y < threat.Y)
+                {
+                    if (facing == PlayerWorldState.Facing.Up)
+                        return new Command(Command.Move.Up, true);
+                    else if (facing == PlayerWorldState.Facing.Right)
+                        return new Command(Command.Move.RotateLeft, true);
+                    else if (facing == PlayerWorldState.Facing.Left)
+                        return new Command(Command.Move.RotateRight, true);
+                    else
+                        return new Command(Command.Move.RotateLeft, false);
+                }
+            }
+            else if(hero.Y == threat.Y)
+            {
+                if (hero.X > threat.X)
+                {
+                    if (facing == PlayerWorldState.Facing.Left)
+                        return new Command(Command.Move.Left, true);
+                    else if (facing == PlayerWorldState.Facing.Down)
+                        return new Command(Command.Move.RotateRight, true);
+                    else if (facing == PlayerWorldState.Facing.Up)
+                        return new Command(Command.Move.RotateLeft, true);
+                    else
+                        return new Command(Command.Move.RotateLeft, false);
+                }
+                else if (hero.X < threat.X)
+                {
+                    if (facing == PlayerWorldState.Facing.Right)
+                        return new Command(Command.Move.Up, true);
+                    else if (facing == PlayerWorldState.Facing.Down)
+                        return new Command(Command.Move.RotateLeft, true);
+                    else if (facing == PlayerWorldState.Facing.Up)
+                        return new Command(Command.Move.RotateRight, true);
+                    else
+                        return new Command(Command.Move.RotateLeft, false);
+                }
+            }
+
+            return new Command(Command.Move.Up, false);
+        }
+
         /// <summary>
         /// Gives a random known node to path to.
         /// </summary>
