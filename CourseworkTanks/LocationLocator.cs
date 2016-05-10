@@ -38,9 +38,16 @@ namespace GridWorld
             int mapWidth = localMap.GetLength(0);
             int mapHeigth = localMap.GetLength(1);
 
+            List<Cell> obs = new List<Cell>();
             //Assumes the player is not at the border of the map.
+            for (int i = hero.X - 1; i <= hero.X + 1; i++)
+            {
+                for (int j = hero.Y - 1; j <= hero.Y + 1; j++)
+                {
 
-            
+                }
+            }
+
             //Base case. Should never be reached.
             return RandomDodge(mapWidth, mapHeigth, threat);
         }
@@ -98,6 +105,18 @@ namespace GridWorld
             }
 
             //Base Case - used if no easy dodges are avalible to the AI, chooses a location to pathfind to.
+            return RandomKnown(w, h);
+        }
+
+        /// <summary>
+        /// Gives a random known node to path to.
+        /// </summary>
+        /// <param name="w">The width of the board.</param>
+        /// <param name="h">The height of the board.</param>
+        /// <returns>A Tuple with the coordinates of the destination.</returns>
+        private Tuple<int, int> RandomKnown(int w, int h)
+        {
+            Random r = new Random();
             Cell c;
             int x;
             int y;
@@ -109,7 +128,6 @@ namespace GridWorld
             } while (c != Cell.Empty);
 
             return new Tuple<int, int>(x, y);
-
         }
 
     }
