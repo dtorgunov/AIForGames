@@ -110,7 +110,7 @@ Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\r
   \begin{tikzpicture}[node distance=2cm, auto]
     \node[situation] (enemy) {Enemy sighted};
     \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
-    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(>\) 1};
+    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(=\) 1};
     \node[situation,below=0.5em of singleEnemy] (default) {Default action};
 
     \node[action,right=3em of enemy] (runAway) {Run away};
@@ -146,7 +146,7 @@ Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\r
   \begin{tikzpicture}[node distance=2cm, auto]
     \node[situation] (enemy) {Enemy sighted};
     \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
-    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(>\) 1};
+    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(=\) 1};
     \node[situation,below=0.5em of singleEnemy] (default) {Default action};
 
     \node[action,right=3em of enemy] (runAway) {Run away};
