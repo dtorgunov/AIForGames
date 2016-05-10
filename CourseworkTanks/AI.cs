@@ -11,12 +11,17 @@ namespace GridWorld
         private PlayerWorldState worldState;
         private Cell[,] localMap;
         private int playerNumber;
+        private SubsumptionDispatch dispatcher;
 
         public dtorguno()
             : base()
         {
             this.Name = "Subsumptive AI";
             this.localMap = null;
+            this.dispatcher = new SubsumptionDispatch();
+
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (SubsumptionDispatch.defaultAction, moveUp));
         }
 
         private void initMap() {
@@ -45,6 +50,11 @@ namespace GridWorld
 
             updateMap();
 
+            return dispatcher.act();
+        }
+
+        public ICommand moveUp()
+        {
             return new Command(Command.Move.Up, true);
         }
 
