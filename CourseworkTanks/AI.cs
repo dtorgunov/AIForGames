@@ -89,6 +89,22 @@ namespace GridWorld
             return aliveEnemyCount == 1;
         }
 
+        public bool seenByEnemy()
+        {
+            GridSquare[,] gs = fromLocalMap();
+            int myX = worldState.MyGridSquare.X;
+            int myY = worldState.MyGridSquare.Y;
+            Tuple<int, int> enemyPosition = getClosestEnemy(gs);
+            PlayerWorldState.Facing enemyFacing = PlayerWorldState.Facing.Down;
+
+            return worldState.CanSee(enemyFacing, enemyPosition.Item1, enemyPosition.Item2, myX, myY, gs);
+        }
+
+        private Tuple<int, int> getClosestEnemy(GridSquare[,] gs)
+        {
+            return new Tuple<int, int>(0, 0);
+        }
+
         private GridSquare[,] fromLocalMap()
         {
             GridSquare[,] gs = new GridSquare[localMap.GetLength(0),localMap.GetLength(1)];
