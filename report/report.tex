@@ -2,6 +2,12 @@
 \usepackage[margin=1.2in]{geometry}
 \usepackage{cite}
 \usepackage{float}
+\usepackage{tikz}
+\usepackage{rotating}
+\usepackage{lscape}
+\usepackage{wrapfig}
+\usepackage{pdflscape}
+\usepackage{afterpage}
 
 \usepackage{listings}
 \lstloadlanguages{[Sharp]C}
@@ -15,6 +21,18 @@
       flexiblecolumns=false,
       basewidth={0.5em,0.45em}
     }
+
+\usetikzlibrary{shapes,arrows,positioning}
+
+\tikzstyle{situation} = [rectangle, draw, fill=white!20, 
+    text width=10em, text centered, minimum height=4em]
+\tikzstyle{action} = [rectangle, draw, fill=white!20, 
+    text width=8em, text centered, rounded corners=2em, minimum height=4em]
+\tikzstyle{subsumptor} = [circle, draw, fill=white!20,
+    text width=3em, text centered]
+\tikzstyle{line_n} = [draw, -latex']
+\tikzstyle{headless_n} = [draw]
+\tikzstyle{anchor_n} = [inner sep=0pt, fill=none, draw=none]
 
 \title{Team \(-i^2\)\\
 AI For Games Coursework Submission (Tanks)}
@@ -57,7 +75,7 @@ Having defined those delegates, we can create a dispatch table in a linked list 
 private List<Tuple<Situation, Action>> dispatchTable;
 \end{code}
 
-We assume that the first element in the list has the highest priority. If its \verb|Situation| arises, we execute the corresponding \verb|Action|. Otherwise, we continue down the list. We assume that at least 1 of the \verb|Situation|s will occur. In order to ensure that, the final element of the list should be a ``default'' action: simulated using a predicate that is always true.
+We assume that the first element in the list has the highest priority. If its \verb|Situation| arises, we execute the corresponding \verb|Action|. Otherwise, we continue down the list. We assume that at least one of the \verb|Situation|s will occur. In order to ensure that, the final element of the list should be a ``default'' action: simulated using a predicate that is always true.
 
 With those definitons, we can now create the main program loop: the \verb|act()| method:
 
@@ -76,9 +94,96 @@ public ICommand act()
 \end{code}
 
 As soon as the \verb|Action| whose \verb|Situation| predicate returns true is found, we simply execute that action, returning the corresponding command to be executed on this turn.
+
 \subsection{Behaviour Profiles} \label{sec:behaviourProfiles}
+
+We consider two possible behaviour profiles for is AI: the Hunter and the Explorer. The goal of the game it to maximise the score, and the behaviour process aims to do so in the most efficient way. If exploration is more valuable, point-wise, than killing opponents, we can utilise the Explorer profile, which focuses primarily on discovering the map and avoiding confrontation. On the other hand, if the amount of points received for killing an enemy is higher than the amount of points gained (on average) through exploration, we utilise the Hunter profile, which will actively seek to destroy enemy tanks.
+
+Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter\footnote{add hunter}.
+
+\afterpage{
+\clearpage
+\begin{landscape}
+\vspace*{\fill}
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[node distance=2cm, auto]
+    \node[situation] (enemy) {Enemy sighted};
+    \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
+    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(>\) 1};
+    \node[situation,below=0.5em of singleEnemy] (default) {Default action};
+
+    \node[action,right=3em of enemy] (runAway) {Run away};
+    \node[action,right=3em of unexploredNode] (headTo) {Head to node};
+    \node[action,right=3em of singleEnemy] (engage) {Engage enemy};
+
+    \node[right=5.5em of engage] (anchorPoint) {};
+    
+    \node[subsumptor, below=2em of anchorPoint] (s1) {\huge S}; 
+    \node[subsumptor, right=2em of s1] (s2) {\huge S}; 
+    \node[subsumptor, right=2em of s2] (s3) {\huge S}; 
+    
+    \node[situation, right=2em of s3] (command) {Command};
+    
+    \path[draw,->] (default) -- (s1);
+    \path[draw,->] (s1) -- (s2);
+    \path[draw,->] (s2) -- (s3);
+    \path[draw,->] (s3) -- (command);
+    
+    \path[draw,->] (enemy) -- (runAway);
+    \path[draw,->] (unexploredNode) -- (headTo);
+    \path[draw,->] (singleEnemy) -- (engage);
+    
+    \path[draw,->] (engage) -| (s1);
+    \path[draw,->] (headTo) -| (s2);
+    \path[draw,->] (runAway) -| (s3);
+  \end{tikzpicture}
+  \caption{The Explorer profile}
+  \label{fig:explorer}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[node distance=2cm, auto]
+    \node[situation] (enemy) {Enemy sighted};
+    \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
+    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(>\) 1};
+    \node[situation,below=0.5em of singleEnemy] (default) {Default action};
+
+    \node[action,right=3em of enemy] (runAway) {Run away};
+    \node[action,right=3em of unexploredNode] (headTo) {Head to node};
+    \node[action,right=3em of singleEnemy] (engage) {Engage enemy};
+
+    \node[right=5.5em of engage] (anchorPoint) {};
+    
+    \node[subsumptor, below=2em of anchorPoint] (s1) {\huge S}; 
+    \node[subsumptor, right=2em of s1] (s2) {\huge S}; 
+    \node[subsumptor, right=2em of s2] (s3) {\huge S}; 
+    
+    \node[situation, right=2em of s3] (command) {Command};
+    
+    \path[draw,->] (default) -- (s1);
+    \path[draw,->] (s1) -- (s2);
+    \path[draw,->] (s2) -- (s3);
+    \path[draw,->] (s3) -- (command);
+    
+    \path[draw,->] (enemy) -- (runAway);
+    \path[draw,->] (unexploredNode) -- (headTo);
+    \path[draw,->] (singleEnemy) -- (engage);
+    
+    \path[draw,->] (engage) -| (s1);
+    \path[draw,->] (headTo) -| (s2);
+    \path[draw,->] (runAway) -| (s3);
+  \end{tikzpicture}
+  \caption{The Hunter profile}
+  \label{fig:hunter}
+\end{figure}
+\vspace*{\fill}
+\end{landscape}
+}
+
 \section{Testing and Tuning}
 \section{Recommendations for Future Work} \label{sec:futureWork}
+.\footnote{Make sure to discuss improvements to GridWorld (i.e. information storage)}
 \section{Conclusions}
 
 \newpage
