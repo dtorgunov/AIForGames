@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AI.cs" />
     <Compile Include="GridNode.cs" />
+    <Compile Include="LocationLocator.cs" />
     <Compile Include="MightyPathFinder.cs" />
     <Compile Include="Tuple.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
