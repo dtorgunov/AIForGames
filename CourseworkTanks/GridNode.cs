@@ -65,6 +65,11 @@
             return walkable;
         }
 
+        public string ToString()
+        {
+            return ("X: " + x +"Y: " + y );
+        }
+
         /// <summary>
         /// Returns the parent GridNode of this GridNode
         /// </summary>
@@ -127,6 +132,7 @@
         /// <returns>The F-cost of this GridNode.</returns>
         public int GetFCost()
         {
+            SetFCost();
             return fCost;
         }
 

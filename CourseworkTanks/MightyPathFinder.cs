@@ -8,16 +8,14 @@ namespace GridWorld
     class MightyPathFinder
     {
         GridNode[,] InternalNodeMap;
-        PlayerWorldState InternalPlayerWorldState;
         Cell[,] InternalCellMap;
         GridNode Hero;
         GridNode Target;
 
      
 
-        public MightyPathFinder(PlayerWorldState PWS, Cell[,] ICM)
+        public MightyPathFinder(Cell[,] ICM)
         {
-            this.InternalPlayerWorldState = PWS;
             this.InternalCellMap = ICM;
             ConvertToGridNodeArray(InternalCellMap);
             
@@ -37,7 +35,7 @@ namespace GridWorld
 
                     if (InternalCellMap[x, y] == Cell.Hero)
                     {
-                        InternalNodeMap[x, y] = new GridNode(x, y, InternalCellMap[x, y]);
+                        Hero = InternalNodeMap[x, y];
 
                     }
                    
@@ -82,7 +80,67 @@ namespace GridWorld
 
         public List<GridNode> GetPathToTarget(Tuple<int, int> TupleNode){
 
-            
+            List<GridNode> open = new List<GridNode>();
+            List<GridNode> closed = new List<GridNode>();
+
+            Target = InternalNodeMap[TupleNode.Item1, TupleNode.Item2];
+
+            open.Add(Hero);
+
+            while (open.Count > 0)
+            {
+
+                GridNode current = open[0];
+
+                for (int i = 1; i < open.Count; i++)
+                {
+
+                    if (open[i].GetFCost() < current.GetFCost() || open[i].GetFCost() == current.GetFCost() && open[i].GetHCost() < current.GetHCost())
+                    {
+                        current = open[i];
+                    }
+
+                 }
+
+                open.Remove(current);
+                closed.Add(current);
+
+                if (current == Target)
+                {
+                    //found target
+
+                    List<GridNode> path = new List<GridNode>();
+                    GridNode retrace = Hero;
+
+                    while (retrace != current && retrace != null)
+                    {
+                        if (retrace.GetParent() == null)
+                             break;
+                        path.Add(retrace);
+                        retrace = retrace.GetParent();
+                    }
+
+                    return path;
+                }
+
+                 List<GridNode> neighbours = GetNeighbours(current);
+                    foreach (GridNode n in neighbours)
+                    {
+                        if (n.GetWalkable() && !closed.Contains(n))
+                        {
+                            int newMovementCost = current.GetGCost() + Heuristic(current, n);
+                            if (newMovementCost < n.GetGCost() || !open.Contains(n))
+                            {
+                                n.SetGCost(newMovementCost);
+                                n.SetHCost(Heuristic(n, Target));
+                                n.SetParent(current);
+                                if (!open.Contains(n))
+                                    open.Add(n);
+                            }
+                        }
+                    }
+                }
+
 
             
             
