@@ -3,6 +3,19 @@
 \usepackage{cite}
 \usepackage{float}
 
+\usepackage{listings}
+\lstloadlanguages{[Sharp]C}
+\lstnewenvironment{code}
+    {\lstset{}%
+      \csname lst@SetFirstLabel\endcsname}
+    {\csname lst@SaveFirstLabel\endcsname}
+    \lstset{
+      language=[Sharp]C,
+      basicstyle=\small\ttfamily,
+      flexiblecolumns=false,
+      basewidth={0.5em,0.45em}
+    }
+
 \title{Team \(-i^2\)\\
 AI For Games Coursework Submission (Tanks)}
 
@@ -26,6 +39,43 @@ The AI produced by our group for this coursework focuses on utilising a subsumpt
 
 The binding of game situations (sensory inputs) to behaviours can be changed dynamically, or assigned at the start. For the purposes of this coursework, we define 2 major ``behavious profiles'' (as discussed in section~\ref{sec:behaviourProfiles}), a ``Hunter'' and an ``Explorer''. For the discussion of potential for dynamic and adaptive behaviour see section~\ref{sec:futureWork}.
 \subsection{Subsumptive Control}
+
+In order to make it possible to implement the subsumptive control system, we have created a class, \verb|SubsumptionDispatch|, which calls the corresponding action when the right ``stimulus'' occurs. For the full source code listing please see section~\ref{sec:subsumptionCode}. In this section we will only highlight the central parts of the implementation.
+
+Firstly, we make use of C\# delegates to allow us to use higher-order methods, passing methods around as values and evoking them when needed. Specifically, we define the following two delegates:
+
+\begin{code}
+public delegate bool Situation();
+public delegate ICommand Action();
+\end{code}
+
+A \verb|Situation| is a predicate that represents a situation in the game, corresponding to sensory input in a traditional subsumption architecture. An \verb|Action| represents a method that returns the next command to execute, corresponding to operating an acutator. It is assumed to take no arguments, relying purely on the internal state of the main class for any information about map composition, current player position, etc.
+
+Having defined those delegates, we can create a dispatch table in a linked list of tuples:
+
+\begin{code}
+private List<Tuple<Situation, Action>> dispatchTable;
+\end{code}
+
+We assume that the first element in the list has the highest priority. If its \verb|Situation| arises, we execute the corresponding \verb|Action|. Otherwise, we continue down the list. We assume that at least 1 of the \verb|Situation|s will occur. In order to ensure that, the final element of the list should be a ``default'' action: simulated using a predicate that is always true.
+
+With those definitons, we can now create the main program loop: the \verb|act()| method:
+
+\begin{code}
+public ICommand act()
+{
+  foreach (Tuple<Situation, Action> behaviour in dispatchTable)
+  {
+    if (behaviour.Item1())
+    {
+      return behaviour.Item2();
+    }
+  }
+  return null;
+}
+\end{code}
+
+As soon as the \verb|Action| whose \verb|Situation| predicate returns true is found, we simply execute that action, returning the corresponding command to be executed on this turn.
 \subsection{Behaviour Profiles} \label{sec:behaviourProfiles}
 \section{Testing and Tuning}
 \section{Recommendations for Future Work} \label{sec:futureWork}
