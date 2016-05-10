@@ -136,13 +136,11 @@ namespace GridWorld
             {
                 for (int j = hero.Y - size; j <= hero.Y + size; j++)
                 {
-                    if (localMap[i, j] == Cell.Rock)
-                        obs.Add(new GridNode(i, j, (int)Cell.Rock, id));
+                    if(i < localMap.GetLength(0) && i >= 0 && j < localMap.GetLength(1) && j >= 0)
+                        if (localMap[i, j] == Cell.Rock)
+                            obs.Add(new GridNode(i, j, (int)Cell.Rock, id));
                 }
             }
-
-
-
             return obs;
         }
 
