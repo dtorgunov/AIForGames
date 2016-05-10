@@ -71,7 +71,7 @@ namespace GridWorld
                         if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
                             return new Tuple<int, int>(gn.X + 1, gn.Y);
                 }
-                if (gn.X == hero.X)
+                else if (gn.X == hero.X)
                 {
                     if (gn.Y < hero.Y && gn.Y > 0)
                         if (localMap[gn.X, gn.Y - 1] == Cell.Empty)
@@ -79,6 +79,42 @@ namespace GridWorld
                     if (gn.Y > hero.Y && gn.Y < mapWidth)
                         if (localMap[gn.X, gn.Y + 1] == Cell.Empty)
                             return new Tuple<int, int>(gn.X, gn.Y + 1);
+                }
+                else if (gn.Y > hero.Y)
+                {
+                    if (gn.Y < mapWidth)
+                        if (localMap[gn.X, gn.Y + 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.X, gn.Y + 1);
+                        else if (gn.X > hero.X)
+                        {
+                            if (gn.X < mapWidth)
+                                if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.X + 1, gn.Y);
+                        }
+                        else if (gn.X < hero.X)
+                        {
+                            if (gn.X > 0)
+                                if (localMap[gn.X - 1, gn.Y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.X - 1, gn.Y);
+                        }
+                }
+                else if (gn.Y < hero.Y)
+                {
+                    if (gn.Y > 0)
+                        if (localMap[gn.X, gn.Y - 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.X, gn.Y + 1);
+                        else if (gn.X > hero.X)
+                        {
+                            if (gn.X < mapWidth)
+                                if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.X + 1, gn.Y);
+                        }
+                        else if (gn.X < hero.X)
+                        {
+                            if (gn.X > 0)
+                                if (localMap[gn.X - 1, gn.Y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.X - 1, gn.Y);
+                        }
                 }
             }
 
