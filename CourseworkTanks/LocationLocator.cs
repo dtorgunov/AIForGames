@@ -200,7 +200,14 @@ namespace GridWorld
             return RandomKnown(w, h);
         }
 
-        public Command Attack(GridSquare threat, PlayerWorldState.Facing facing) 
+        /// <summary>
+        /// Makes a decision how to attack.
+        /// </summary>
+        /// <param name="threat">The enemy to attack</param>
+        /// <param name="facing">The direction the player is facing.</param>
+        /// <param name="mpf">The pathfinder.</param>
+        /// <returns>The issued command.</returns>
+        public Command Attack(GridSquare threat, PlayerWorldState.Facing facing, MightyPathFinder mpf) 
         {
             if (hero.X == threat.X)
             {
@@ -253,7 +260,18 @@ namespace GridWorld
                 }
             }
 
-            return new Command(Command.Move.Up, false);
+            /* Uncomment me when the PathFinding is synced with this branch.
+            GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y)).ElementAt(0);
+
+            if (travel.X > hero.X)
+                return new Command(Command.Move.Left, false);
+            else if (travel.X < hero.X)
+                return new Command(Command.Move.Right, false);
+            else if (travel.Y > hero.Y)
+                return new Command(Command.Move.Up, false);
+            else
+                return new Command(Command.Move.Down, false);
+            */
         }
 
         /// <summary>
