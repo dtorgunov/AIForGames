@@ -54,6 +54,8 @@ namespace GridWorld
                 }
             }
 
+
+
             //Base case. Should never be reached.
             return RandomDodge(mapWidth, mapHeigth, threat);
         }
@@ -142,7 +144,7 @@ namespace GridWorld
         /// <param name="w">The width of the board.</param>
         /// <param name="h">The height of the board.</param>
         /// <returns>A Tuple with the coordinates of the destination.</returns>
-        private Tuple<int, int> RandomKnown(int w, int h)
+        public Tuple<int, int> RandomKnown(int w, int h)
         {
             Random r = new Random();
             Cell c;
@@ -154,6 +156,28 @@ namespace GridWorld
                 y = r.Next(h);
                 c = localMap[w, h];
             } while (c != Cell.Empty);
+
+            return new Tuple<int, int>(x, y);
+        }
+
+        /// <summary>
+        /// Gives a random unknown node to path to.
+        /// </summary>
+        /// <param name="w">The width of the board.</param>
+        /// <param name="h">The height of the board.</param>
+        /// <returns>A Tuple with the coordinates of the destination.</returns>
+        public Tuple<int, int> RandomUnknown(int w, int h)
+        {
+            Random r = new Random();
+            Cell c;
+            int x;
+            int y;
+            do
+            {
+                x = r.Next(w);
+                y = r.Next(h);
+                c = localMap[w, h];
+            } while (c != Cell.Unexplored);
 
             return new Tuple<int, int>(x, y);
         }
