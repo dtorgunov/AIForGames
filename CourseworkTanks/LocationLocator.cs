@@ -10,15 +10,16 @@ namespace GridWorld
 
         private Cell[,] localMap;
         private GridSquare hero;
+        private int id;
 
         /// <summary>
         /// Constructs the class.
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
         /// <param name="hero">Location of the player.</param>
-        public LocationLocator(Cell[,] localMap, GridSquare hero)
+        public LocationLocator(Cell[,] localMap, GridSquare hero, int id)
         {
-            Update(localMap, hero);
+            Update(localMap, hero, id);
         }
 
         /// <summary>
@@ -26,20 +27,25 @@ namespace GridWorld
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
         /// <param name="hero">Location of the player.</param>
-        public void Update(Cell[,] localMap, GridSquare hero)
+        public void Update(Cell[,] localMap, GridSquare hero, int id)
         {
             this.localMap = localMap;
             this.hero = hero;
+            this.id = id;
         }
 
-
+        /// <summary>
+        /// Gives a location to locate to.
+        /// </summary>
+        /// <param name="threat">The threat to retreat from.</param>
+        /// <returns>A Tuple with the coordinates of the destination.</returns>
         public Tuple<int, int> Retreat(GridSquare threat)
         {
             int mapWidth = localMap.GetLength(0);
             int mapHeigth = localMap.GetLength(1);
 
             int searchSize = 1;
-            List<Cell> obs = MapObs(searchSize);
+            List<GridNode> obs = MapObs(searchSize);
 
             while(obs.Count == 0) 
             {
@@ -54,7 +60,7 @@ namespace GridWorld
                 }
             }
 
-
+            
 
             //Base case. Should never be reached.
             return RandomDodge(mapWidth, mapHeigth, threat);
@@ -65,9 +71,9 @@ namespace GridWorld
         /// </summary>
         /// <param name="size">How far away from the player to go.</param>
         /// <returns>A list of the nearby obstacles.</returns>
-        private List<Cell> MapObs(int size)
+        private List<GridNode> MapObs(int size)
         {
-            List<Cell> obs = new List<Cell>();
+            List<GridNode> obs = new List<GridNode>();
 
             //Assumes the player is not at the border of the map.
             for (int i = hero.X - size; i <= hero.X + size; i++)
@@ -75,7 +81,7 @@ namespace GridWorld
                 for (int j = hero.Y - size; j <= hero.Y + size; j++)
                 {
                     if (localMap[i, j] == Cell.Rock)
-                        obs.Add(localMap[i, j]);
+                        obs.Add(new GridNode(i, j, (int)Cell.Rock, id));
                 }
             }
 
