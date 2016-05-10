@@ -38,20 +38,27 @@ namespace GridWorld
             int mapWidth = localMap.GetLength(0);
             int mapHeigth = localMap.GetLength(1);
 
+            List<Cell> obs = MapObs(1);
+
+            //Base case. Should never be reached.
+            return RandomDodge(mapWidth, mapHeigth, threat);
+        }
+
+        private List<Cell> MapObs(int size)
+        {
             List<Cell> obs = new List<Cell>();
 
             //Assumes the player is not at the border of the map.
-            for (int i = hero.X - 1; i <= hero.X + 1; i++)
+            for (int i = hero.X - size; i <= hero.X + size; i++)
             {
-                for (int j = hero.Y - 1; j <= hero.Y + 1; j++)
+                for (int j = hero.Y - size; j <= hero.Y + size; j++)
                 {
                     if (localMap[i, j] == Cell.Rock)
                         obs.Add(localMap[i, j]);
                 }
             }
 
-            //Base case. Should never be reached.
-            return RandomDodge(mapWidth, mapHeigth, threat);
+            return obs;
         }
 
         /// <summary>
