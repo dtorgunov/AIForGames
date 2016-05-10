@@ -60,7 +60,27 @@ namespace GridWorld
                 }
             }
 
-            
+            foreach (GridNode gn in obs)
+            {
+                if (gn.Y == hero.Y)
+                {
+                    if (gn.X < hero.X && gn.X > 0)
+                        if (localMap[gn.X - 1, gn.Y] == Cell.Empty)
+                            return new Tuple<int, int>(gn.X - 1, gn.Y);
+                    if (gn.X > hero.X && gn.X < mapWidth)
+                        if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
+                            return new Tuple<int, int>(gn.X + 1, gn.Y);
+                }
+                if (gn.X == hero.X)
+                {
+                    if (gn.Y < hero.Y && gn.Y > 0)
+                        if (localMap[gn.X, gn.Y - 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.X, gn.Y - 1);
+                    if (gn.Y > hero.Y && gn.Y < mapWidth)
+                        if (localMap[gn.X, gn.Y + 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.X, gn.Y + 1);
+                }
+            }
 
             //Base case. Should never be reached.
             return RandomDodge(mapWidth, mapHeigth, threat);
@@ -84,6 +104,8 @@ namespace GridWorld
                         obs.Add(new GridNode(i, j, (int)Cell.Rock, id));
                 }
             }
+
+
 
             return obs;
         }
