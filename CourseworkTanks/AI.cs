@@ -53,6 +53,44 @@ namespace GridWorld
             return dispatcher.act();
         }
 
+        // Predicates (Situations)
+
+        public bool unexploredExists()
+        {
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    if (localMap[x, y] == Cell.Unexplored)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool singleEnemy()
+        {
+            int totalEnemyCount = worldState.PlayerCount - 1;
+            int aliveEnemyCount = totalEnemyCount;
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    if (localMap[x, y] == Cell.Destroyed)
+                    {
+                        // subtract the enemies we know are destroyed
+                        aliveEnemyCount--;
+                    }
+                }
+            }
+
+            return aliveEnemyCount == 1;
+        }
+
+        // Actions
+
         public ICommand moveUp()
         {
             return new Command(Command.Move.Up, true);
