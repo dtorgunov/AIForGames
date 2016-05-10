@@ -18,10 +18,28 @@ AI For Games Coursework Submission (Tanks)}
 \newpage
 
 \section{Introduction}
+This report details the implementation of a subsumption-based AI, as developed by the group ``Team \(-i^2\)''.\footnote{Refine and add abstract}
+
 \section{AI Design}
+
+The AI produced by our group for this coursework focuses on utilising a subsumption architecture, inspired by the work done by one of the group members in the context of intelligent robotics. The subsumptive architecture, as proposed by Brooks, aims to form close connections between sensory inputs and behaviours of an intelligent agent\cite{brooks1}. In the context of an intelligent Tanks player, we can take information gleamed from the state of the map as simulating sensory inputs, and define a series of behaviours (such as running away, exploring, or seeking an enemy) to take in specific situtations. This approach lends itself well to group work, as individual components and behaviours can be developed separately, and then combined in arbitrairly complex ways using the subsumption architecture.
+
+The binding of game situations (sensory inputs) to behaviours can be changed dynamically, or assigned at the start. For the purposes of this coursework, we define 2 major ``behavious profiles'' (as discussed in section~\ref{sec:behaviourProfiles}), a ``Hunter'' and an ``Explorer''. For the discussion of potential for dynamic and adaptive behaviour see section~\ref{sec:futureWork}.
 \subsection{Subsumptive Control}
-\subsection{Behaviour Profiles}
+\subsection{Behaviour Profiles} \label{sec:behaviourProfiles}
 \section{Testing and Tuning}
-\section{Recommendations for Future Work}
+\section{Recommendations for Future Work} \label{sec:futureWork}
 \section{Conclusions}
+
+\newpage
+% \clearpage
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,references}
+
+\newpage
+\appendix
+
+\section{Evidence of Group Work}
+\section{Source code}
 \end{document}

@@ -178,3 +178,7 @@ TSWLatexianTemp*
 
 # KBibTeX
 *~[0-9]*
+
+# IEEE files (should be installed locally)
+IEEEabrv.bib
+IEEEtran.bst
