@@ -181,6 +181,12 @@
             }
         }
 
+        public Tuple<int, int> ToTuple()
+        {
+
+            return new Tuple<int, int>(x, y);
+        }
+
 
     }
 }
