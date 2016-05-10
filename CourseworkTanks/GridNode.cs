@@ -8,6 +8,7 @@
         int x;
         int y;
         int tile;
+        Cell cell;
         int hCost;
         int gCost;
         int fCost;
@@ -28,6 +29,23 @@
             this.tile = tile;
 
             if (tile == id || tile == -id || tile == 0)
+            {
+                walkable = true;
+            }
+            else
+            {
+                walkable = false;
+            }
+
+        }
+
+        public GridNode(int x, int y, Cell cell){
+
+            this.x = x;
+            this.y = y;
+            this.cell = cell;
+
+            if (cell == Cell.Empty)
             {
                 walkable = true;
             }

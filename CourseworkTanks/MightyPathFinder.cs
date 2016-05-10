@@ -7,29 +7,51 @@ namespace GridWorld
 {
     class MightyPathFinder
     {
-        GridNode[,] gridNodeBoardArray;
-        PlayerWorldState myworld;
+        GridNode[,] InternalNodeMap;
+        PlayerWorldState InternalPlayerWorldState;
+        Cell[,] InternalCellMap;
+        GridNode Hero;
+     
 
-        enum tiles {Empty,Rock,Hero,Enemy,Rubble,Unexplored};
-
-        public MightyPathFinder(PlayerWorldState p)
+        public MightyPathFinder(PlayerWorldState PWS, Cell[,] ICM)
         {
-            this.myworld = p;
+            this.InternalPlayerWorldState = PWS;
+            this.InternalCellMap = ICM;
+
+            
         }
 
-        public void ConvertToGridNodeArray(PlayerWorldState p)
+        public void ConvertToGridNodeArray(Cell[,] ICM)
         {
+            InternalNodeMap = new GridNode[InternalCellMap.GetLength(0),InternalCellMap.GetLength(1)];
+
+            for (int x = 0; x < InternalCellMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < InternalCellMap.GetLength(1); y++)
+                {
 
 
+                    InternalNodeMap[x, y] = new GridNode(x, y, InternalCellMap[x, y]);
+
+                    if (InternalCellMap[x, y] == Cell.Hero)
+                    {
+                        InternalNodeMap[x, y] = new GridNode(x, y, InternalCellMap[x, y]);
+
+                    }
+                   
+                }//End of Y 
+            }// End of X 
 
         }
 
 
 
-        public List<GridNode> GetPathToTarget(GridNode Target){
+        public List<GridNode> GetPathToTarget(Tuple<int, int> TupleNode){
 
 
 
+            
+            
             return new List<GridNode>();
 
         }
