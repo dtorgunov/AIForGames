@@ -9,26 +9,29 @@ namespace GridWorld
     {
 
         private Cell[,] localMap;
+        private GridSquare hero;
 
         /// <summary>
         /// Constructs the class.
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
-        public LocationLocator(Cell[,] localMap)
+        public LocationLocator(Cell[,] localMap, GridSquare hero)
         {
             this.localMap = localMap;
+            this.hero = hero;
         }
 
         /// <summary>
         /// Updates the localMap
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
-        public void Update(Cell[,] localMap)
+        public void Update(Cell[,] localMap, GridSquare hero)
         {
             this.localMap = localMap;
+            this.hero = hero;
         }
 
-        public Cell Retreat()
+        public /*WhateverConnorNeeds*/ Retreat()
         {
             
         }
