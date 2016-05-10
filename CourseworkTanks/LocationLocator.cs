@@ -39,12 +39,14 @@ namespace GridWorld
             int mapHeigth = localMap.GetLength(1);
 
             List<Cell> obs = new List<Cell>();
+
             //Assumes the player is not at the border of the map.
             for (int i = hero.X - 1; i <= hero.X + 1; i++)
             {
                 for (int j = hero.Y - 1; j <= hero.Y + 1; j++)
                 {
-
+                    if (localMap[i, j] == Cell.Rock)
+                        obs.Add(localMap[i, j]);
                 }
             }
 
