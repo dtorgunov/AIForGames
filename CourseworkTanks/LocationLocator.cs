@@ -62,58 +62,58 @@ namespace GridWorld
 
             foreach (GridNode gn in obs)
             {
-                if (gn.Y == hero.Y)
+                if (gn.x == hero.Y)
                 {
-                    if (gn.X < hero.X && gn.X > 0)
-                        if (localMap[gn.X - 1, gn.Y] == Cell.Empty)
-                            return new Tuple<int, int>(gn.X - 1, gn.Y);
-                    if (gn.X > hero.X && gn.X < mapWidth)
-                        if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
-                            return new Tuple<int, int>(gn.X + 1, gn.Y);
+                    if (gn.x < hero.X && gn.x > 0)
+                        if (localMap[gn.x - 1, gn.y] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x - 1, gn.y);
+                    if (gn.x > hero.X && gn.x < mapWidth)
+                        if (localMap[gn.x + 1, gn.y] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x + 1, gn.y);
                 }
-                else if (gn.X == hero.X)
+                else if (gn.x == hero.X)
                 {
-                    if (gn.Y < hero.Y && gn.Y > 0)
-                        if (localMap[gn.X, gn.Y - 1] == Cell.Empty)
-                            return new Tuple<int, int>(gn.X, gn.Y - 1);
-                    if (gn.Y > hero.Y && gn.Y < mapWidth)
-                        if (localMap[gn.X, gn.Y + 1] == Cell.Empty)
-                            return new Tuple<int, int>(gn.X, gn.Y + 1);
+                    if (gn.y < hero.Y && gn.y > 0)
+                        if (localMap[gn.x, gn.y - 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x, gn.y - 1);
+                    if (gn.y > hero.Y && gn.y < mapWidth)
+                        if (localMap[gn.x, gn.y + 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x, gn.y + 1);
                 }
-                else if (gn.Y > hero.Y)
+                else if (gn.y > hero.Y)
                 {
-                    if (gn.Y < mapWidth)
-                        if (localMap[gn.X, gn.Y + 1] == Cell.Empty)
-                            return new Tuple<int, int>(gn.X, gn.Y + 1);
-                        else if (gn.X > hero.X)
+                    if (gn.y < mapWidth)
+                        if (localMap[gn.x, gn.y + 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x, gn.y + 1);
+                        else if (gn.x > hero.X)
                         {
-                            if (gn.X < mapWidth)
-                                if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.X + 1, gn.Y);
+                            if (gn.x < mapWidth)
+                                if (localMap[gn.x + 1, gn.y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.x + 1, gn.y);
                         }
-                        else if (gn.X < hero.X)
+                        else if (gn.x < hero.X)
                         {
-                            if (gn.X > 0)
-                                if (localMap[gn.X - 1, gn.Y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.X - 1, gn.Y);
+                            if (gn.x > 0)
+                                if (localMap[gn.x - 1, gn.y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.x - 1, gn.y);
                         }
                 }
-                else if (gn.Y < hero.Y)
+                else if (gn.y < hero.Y)
                 {
-                    if (gn.Y > 0)
-                        if (localMap[gn.X, gn.Y - 1] == Cell.Empty)
-                            return new Tuple<int, int>(gn.X, gn.Y + 1);
-                        else if (gn.X > hero.X)
+                    if (gn.y > 0)
+                        if (localMap[gn.x, gn.y - 1] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x, gn.y + 1);
+                        else if (gn.x > hero.X)
                         {
-                            if (gn.X < mapWidth)
-                                if (localMap[gn.X + 1, gn.Y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.X + 1, gn.Y);
+                            if (gn.x < mapWidth)
+                                if (localMap[gn.x + 1, gn.y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.x + 1, gn.y);
                         }
-                        else if (gn.X < hero.X)
+                        else if (gn.x < hero.X)
                         {
-                            if (gn.X > 0)
-                                if (localMap[gn.X - 1, gn.Y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.X - 1, gn.Y);
+                            if (gn.x > 0)
+                                if (localMap[gn.x - 1, gn.y] == Cell.Empty)
+                                    return new Tuple<int, int>(gn.x - 1, gn.y);
                         }
                 }
             }
@@ -138,7 +138,7 @@ namespace GridWorld
                 {
                     if(i < localMap.GetLength(0) && i >= 0 && j < localMap.GetLength(1) && j >= 0)
                         if (localMap[i, j] == Cell.Rock)
-                            obs.Add(new GridNode(i, j, (int)Cell.Rock, id));
+                            obs.Add(new GridNode(i, j, Cell.Rock));
                 }
             }
             return obs;
@@ -262,11 +262,11 @@ namespace GridWorld
 
             GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y)).ElementAt(0);
 
-            if (travel.X > hero.X)
+            if (travel.x > hero.X)
                 return new Command(Command.Move.Right, false);
-            else if (travel.X < hero.X)
+            else if (travel.x < hero.X)
                 return new Command(Command.Move.Left, false);
-            else if (travel.Y > hero.Y)
+            else if (travel.y > hero.Y)
                 return new Command(Command.Move.Up, false);
             else
                 return new Command(Command.Move.Down, false);
