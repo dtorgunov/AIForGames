@@ -12,6 +12,8 @@ namespace GridWorld
         private GridSquare hero;
         private int id;
 
+        private Tuple<int, int> unexplored;
+
         /// <summary>
         /// Constructs the class.
         /// </summary>
@@ -19,6 +21,7 @@ namespace GridWorld
         /// <param name="hero">Location of the player.</param>
         public LocationLocator(Cell[,] localMap, GridSquare hero, int id)
         {
+            this.unexplored = null;
             Update(localMap, hero, id);
         }
 
@@ -260,7 +263,7 @@ namespace GridWorld
                 }
             }
 
-            GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y)).ElementAt(0);
+            GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y), hero).ElementAt(0);
 
             if (travel.x > hero.X)
                 return new Command(Command.Move.Right, false);
@@ -317,13 +320,27 @@ namespace GridWorld
             return new Tuple<int, int>(x, y);
         }
 
+        public Tuple<int, int> UnexploredNode(GridSquare hero)
+        {
+            if (unexplored == null)
+            {
+                SetUnexploredNode(hero); // potential for infinite loop if called with no unexplored nodes remaining
+            }
+
+            if (localMap[unexplored.Item1, unexplored.Item2] != Cell.Unexplored)
+            {
+                SetUnexploredNode(hero);
+            }
+
+            return unexplored;
+        }
+
         /// <summary>
         /// Find a random unexplored node that is reachable (i.e. 'pathfindable' from our
-        /// current position).
+        /// current position) and set it as the current "unexplored" target.
         /// </summary>
         /// <param name="hero">The player's position</param>
-        /// <returns>The coordinates of a reachable unexplored node</returns>
-        public Tuple<int, int> UnexploredNode(GridSquare hero)
+        private void SetUnexploredNode(GridSquare hero)
         {
             List<Tuple<int, int>> checkedList = new List<Tuple<int, int>>();
             List<Tuple<int, int>> unexplored = new List<Tuple<int, int>>();
@@ -368,11 +385,11 @@ namespace GridWorld
 
             if (unexplored.Count == 0)
             {
-                return null;
+                this.unexplored = null;
             }
 
             Random r = new Random();
-            return unexplored.ElementAt(r.Next(unexplored.Count));
+            this.unexplored = unexplored.ElementAt(r.Next(unexplored.Count));
         }
 
         /// <summary>
@@ -385,8 +402,9 @@ namespace GridWorld
         {
             List<Tuple<int, int>> neighbours = new List<Tuple<int, int>>();
 
-            if (localMap[node.Item1, node.Item2] != Cell.Unexplored
-             && localMap[node.Item1, node.Item2] != Cell.Rock)
+            //if (localMap[node.Item1, node.Item2] != Cell.Unexplored
+            // && localMap[node.Item1, node.Item2] != Cell.Rock)
+            if(!potentialWall(node))
             {
                 Stack<Tuple<int, int>> potentialNeighbours
                     = new Stack<Tuple<int, int>>();
@@ -409,6 +427,84 @@ namespace GridWorld
             }
 
             return neighbours;
+        }
+
+        /// <summary>
+        /// Determine whether a block is likely to belong to a "wall" that we can't pathfind around.
+        /// </summary>
+        /// <param name="coord">Coodrinates of a node to check</param>
+        /// <returns>True if coord is a potential element in the middle of a wall, false if it is a passable node or possibly a wall "edge".</returns>
+        private bool potentialWall(Tuple<int, int> coord)
+        {
+            if (passable(coord))
+            {
+                return false;
+            }
+
+            Stack<Tuple<int, int>> leftRight = new Stack<Tuple<int, int>>();
+            List<Tuple<int, int>> leftRightValid = new List<Tuple<int, int>>();
+            Stack<Tuple<int, int>> upDown = new Stack<Tuple<int, int>>();
+            List<Tuple<int, int>> upDownValid = new List<Tuple<int, int>>();
+
+            int x = coord.Item1;
+            int y = coord.Item2;
+
+            leftRight.Push(new Tuple<int, int>(x - 1, y));
+            leftRight.Push(new Tuple<int, int>(x + 1, y));
+            upDown.Push(new Tuple<int, int>(x, y + 1));
+            upDown.Push(new Tuple<int, int>(x, y - 1));
+
+            bool result = true;
+
+            foreach (var coor in leftRight)
+            {
+                if (IsValidCoordinate(coor))
+                {
+                    result &= nonObsticle(coor);
+                }
+            }
+
+            if (result)
+            {
+                return true;
+            }
+
+            result = true;
+
+            foreach (Tuple<int, int> coor in upDown)
+            {
+                if (IsValidCoordinate(coor))
+                {
+                    result &= nonObsticle(coor);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Checks if a given node is traversable in terms of pathfinding
+        /// </summary>
+        /// <param name="coord">Coordinates of a node to check</param>
+        /// <returns>True if pathfinding considers the node passable, false otherwise.</returns>
+        private bool passable(Tuple<int, int> coord)
+        {
+            return (localMap[coord.Item1, coord.Item2] == Cell.Empty)
+                || (localMap[coord.Item1, coord.Item2] == Cell.Hero);
+        }
+
+        /// <summary>
+        /// Check if a map is not an obsticle. Since this is used for exploring the map, we consider Unexplored
+        /// cells to not be obsticles. Please keep in mind that this should ONLY be used when analyzing a cell
+        /// as belonging to a wall or not. A rock with an unexplored cell above it is considered to be at the
+        /// "edge", since we don't know if the Unexplored cell is passable or not. However, neighbours of such
+        /// cells should not be generated, as that would lead to the whole map being considered reachable.
+        /// </summary>
+        /// <param name="coord">Coordinates of a node to check</param>
+        /// <returns>See method description</returns>
+        private bool nonObsticle(Tuple<int, int> coord)
+        {
+            return passable(coord) || (localMap[coord.Item1, coord.Item2] == Cell.Unexplored);
         }
 
         /// <summary>

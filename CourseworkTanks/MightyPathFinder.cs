@@ -36,15 +36,15 @@ namespace GridWorld
             }
         }
 
-        private List<GridNode> GetNeighbours(GridNode node)
+        private List<GridNode> GetNeighbours(GridNode node, GridNode target)
         {
 
             // to account for impassable cells, we say that an unwalkable cell has no neighbours
             // therefore it will never be part of a path, other than as the goal
-            if (!node.walkable)
+            /*if (!node.walkable)
             {
                 return new List<GridNode>();
-            }
+            }*/
 
             List<GridNode> neighbours = new List<GridNode>();
 
@@ -63,10 +63,48 @@ namespace GridWorld
             {
                 if (IsValidCoordinate(coor))
                 {
-                    neighbours.Add(InternalNodeMap[coor.Item1, coor.Item2]);
+                    GridNode n = InternalNodeMap[coor.Item1, coor.Item2];
+                    if (n.walkable || n.Equals(target))
+                    {
+                        neighbours.Add(n);
+                    }
                 }
             }
             return neighbours;
+        }
+
+        private bool reachableUnexplored(GridNode node)
+        {
+            if (node.cell == Cell.Unexplored)
+            {
+                Stack<Tuple<int, int>> potentialNeighbours
+                   = new Stack<Tuple<int, int>>();
+
+                int x = node.x;
+                int y = node.y;
+
+                potentialNeighbours.Push(new Tuple<int, int>(x - 1, y));
+                potentialNeighbours.Push(new Tuple<int, int>(x + 1, y));
+                potentialNeighbours.Push(new Tuple<int, int>(x, y - 1));
+                potentialNeighbours.Push(new Tuple<int, int>(x, y + 1));
+
+                foreach (Tuple<int, int> coor in potentialNeighbours)
+                {
+                    if (IsValidCoordinate(coor))
+                    {
+                        GridNode n = InternalNodeMap[coor.Item1, coor.Item2];
+                        if (n.walkable)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private bool IsValidCoordinate(Tuple<int, int> coor)
@@ -94,7 +132,7 @@ namespace GridWorld
         }
 
 
-        public List<GridNode> GetPathToTarget(Tuple<int, int> TupleNode){
+        public List<GridNode> GetPathToTarget(Tuple<int, int> TupleNode, GridSquare heroPos){
 
             ConvertToGridNodeArray(InternalCellMap);
 
@@ -102,8 +140,9 @@ namespace GridWorld
             List<GridNode> closed = new List<GridNode>();
 
             GridNode Target = InternalNodeMap[TupleNode.Item1, TupleNode.Item2];
+            GridNode heroNode = new GridNode(heroPos.X, heroPos.Y, Cell.Hero);
 
-            open.Add(Hero);
+            open.Add(heroNode);
 
             while (open.Count > 0)
             {
@@ -124,16 +163,12 @@ namespace GridWorld
                     }
 
                     // reverse the path
-                    List<GridNode> properPath = new List<GridNode>();
-                    foreach (var node in path)
-                    {
-                        properPath.Add(node);
-                    }
+                    path.Reverse();
 
-                    return properPath;
+                    return path;
                 }
 
-                 List<GridNode> neighbours = GetNeighbours(current);
+                 List<GridNode> neighbours = GetNeighbours(current, Target);
                     foreach (var n in neighbours)
                     {
                         int cost = current.gCost + 1; // assume movement cost is always 1 (even terrain)
