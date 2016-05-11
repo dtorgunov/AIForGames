@@ -22,6 +22,8 @@ namespace GridWorld
             this.Name = "Subsumptive AI";
             this.localMap = null;
             this.dispatcher = new SubsumptionDispatch();
+
+            WriteTrace("Huh?");
             
             /*dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (unexploredExists, goToUnexplored));
@@ -33,7 +35,7 @@ namespace GridWorld
                 (singleEnemy, moveUp));*/
 
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (SubsumptionDispatch.defaultAction, moveToAPlace));
+                (SubsumptionDispatch.defaultAction, goToUnexplored));
         }
 
         private void initMap() {
@@ -129,15 +131,16 @@ namespace GridWorld
 
         public ICommand moveToAPlace()
         {
-            Tuple<int, int> aPlace = new Tuple<int, int>(2, 0);
-            return directionToMove(aPlace);
+            WriteTrace("Hey, look, I'm going to a place!");
+            Tuple<int, int> aPlace = new Tuple<int, int>(0, 1);
+            return explorationMove(aPlace);
         }
 
         public ICommand runAway()
         {
             GridSquare enemy = getClosestEnemy();
             Tuple<int, int> goHere = locationLocator.Retreat(enemy);
-            return directionToMove(goHere);
+            return urgentMove(goHere);
         }
 
         public ICommand engageEnemy()
@@ -149,7 +152,7 @@ namespace GridWorld
         public ICommand goToUnexplored()
         {
             Tuple<int, int> dest = locationLocator.UnexploredNode(worldState.MyGridSquare);
-            return directionToMove(dest);
+            return explorationMove(dest);
         }
 
         public ICommand lookForTrouble()
@@ -231,7 +234,52 @@ namespace GridWorld
             //locationLocator.Update(localMap, hero, 0);
         }
 
-        private Command directionToMove(Tuple<int, int> destination)
+        // turn, then move next turn (unless subsumpted to do otherwise)
+        private Command explorationMove(Tuple<int, int> destination)
+        {
+            Command.Move expectedBearing = directionToMove(destination);
+            PlayerWorldState.Facing bearing = worldState.MyFacing;
+
+            if (equivalentBearing(bearing, expectedBearing))
+            {
+                return moveInDirection(destination);
+            }
+            else
+            {
+                return turnToFace(destination);
+            }
+        }
+
+        // move without turning
+        private Command urgentMove(Tuple<int, int> destination)
+        {
+            return moveInDirection(destination);
+        }
+
+        private Command moveInDirection(Tuple<int, int> destination)
+        {
+            return new Command(directionToMove(destination), false);
+        }
+
+        private Command turnToFace(Tuple<int, int> destination)
+        {
+            return new Command(directionToTurn(destination), false);
+        }
+
+        private bool equivalentBearing(PlayerWorldState.Facing bearing,
+                                        Command.Move expectedBearing)
+        {
+            return (bearing == PlayerWorldState.Facing.Down 
+                    && expectedBearing == Command.Move.Down)
+                || (bearing == PlayerWorldState.Facing.Up 
+                    && expectedBearing == Command.Move.Up)
+                || (bearing == PlayerWorldState.Facing.Left 
+                    && expectedBearing == Command.Move.Left)
+                || (bearing == PlayerWorldState.Facing.Right 
+                    && expectedBearing == Command.Move.Right);
+        }
+
+        private Command.Move directionToMove(Tuple<int, int> destination)
         {
             List<GridNode> path = pathFinder.GetPathToTarget(destination);
             GridSquare hero = worldState.MyGridSquare;
@@ -239,19 +287,37 @@ namespace GridWorld
             GridNode nextMove = path.ElementAt(0);
             if (nextMove.x > hero.X)
             {
-                return new Command(Command.Move.Right, false);
+                return Command.Move.Right;
             }
             else if (nextMove.x < hero.X)
             {
-                return new Command(Command.Move.Left, false);
+                return Command.Move.Left;
             }
             else if (nextMove.y > hero.Y)
             {
-                return new Command(Command.Move.Up, false);
+                return Command.Move.Up;
             }
             else
             {
-                return new Command(Command.Move.Down, false);
+                return Command.Move.Down;
+            }
+        }
+
+        private Command.Move directionToTurn(Tuple<int, int> destination)
+        {
+            Command.Move bearing = directionToMove(destination);
+
+            if (bearing == Command.Move.Right)
+            {
+                return Command.Move.RotateRight;
+            }
+            else if (bearing == Command.Move.Left)
+            {
+                return Command.Move.RotateLeft;
+            }
+            else
+            { // will need to turn twice
+                return Command.Move.RotateLeft;
             }
         }
 
