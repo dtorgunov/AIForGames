@@ -234,52 +234,16 @@ namespace GridWorld
             if (hero.X == threat.X)
             {
                 if (hero.Y > threat.Y)
-                {
-                    if (facing == PlayerWorldState.Facing.Down)
-                        return new Command(Command.Move.Down, true);
-                    else if (facing == PlayerWorldState.Facing.Right)
-                        return new Command(Command.Move.RotateRight, true);
-                    else if (facing == PlayerWorldState.Facing.Left)
-                        return new Command(Command.Move.RotateLeft, true);
-                    else
-                        return new Command(Command.Move.RotateLeft, false);
-                }
+                    return AttackFacing(facing, PlayerWorldState.Facing.Down, PlayerWorldState.Facing.Right, PlayerWorldState.Facing.Left);
                 else if (hero.Y < threat.Y)
-                {
-                    if (facing == PlayerWorldState.Facing.Up)
-                        return new Command(Command.Move.Up, true);
-                    else if (facing == PlayerWorldState.Facing.Right)
-                        return new Command(Command.Move.RotateLeft, true);
-                    else if (facing == PlayerWorldState.Facing.Left)
-                        return new Command(Command.Move.RotateRight, true);
-                    else
-                        return new Command(Command.Move.RotateLeft, false);
-                }
+                    return AttackFacing(facing, PlayerWorldState.Facing.Up, PlayerWorldState.Facing.Left, PlayerWorldState.Facing.Right);
             }
             else if(hero.Y == threat.Y)
             {
                 if (hero.X > threat.X)
-                {
-                    if (facing == PlayerWorldState.Facing.Left)
-                        return new Command(Command.Move.Left, true);
-                    else if (facing == PlayerWorldState.Facing.Down)
-                        return new Command(Command.Move.RotateRight, true);
-                    else if (facing == PlayerWorldState.Facing.Up)
-                        return new Command(Command.Move.RotateLeft, true);
-                    else
-                        return new Command(Command.Move.RotateLeft, false);
-                }
+                    return AttackFacing(facing, PlayerWorldState.Facing.Left, PlayerWorldState.Facing.Down, PlayerWorldState.Facing.Up);
                 else if (hero.X < threat.X)
-                {
-                    if (facing == PlayerWorldState.Facing.Right)
-                        return new Command(Command.Move.Up, true);
-                    else if (facing == PlayerWorldState.Facing.Down)
-                        return new Command(Command.Move.RotateLeft, true);
-                    else if (facing == PlayerWorldState.Facing.Up)
-                        return new Command(Command.Move.RotateRight, true);
-                    else
-                        return new Command(Command.Move.RotateLeft, false);
-                }
+                    return AttackFacing(facing, PlayerWorldState.Facing.Right, PlayerWorldState.Facing.Up, PlayerWorldState.Facing.Down);
             }
 
             GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y)).ElementAt(0);
@@ -293,6 +257,26 @@ namespace GridWorld
             else
                 return new Command(Command.Move.Down, false);
             
+        }
+
+        /// <summary>
+        /// Attacks if the player is facing an opponent.
+        /// </summary>
+        /// <param name="facing">The direction the player is facing.</param>
+        /// <param name="noRotate">The direction to face when facing the enemy.</param>
+        /// <param name="rotateRight">The direction to face when one rotateRight away from the enemy.</param>
+        /// <param name="rotateLeft">The direction to face when one rotateLeft away from the enemy.</param>
+        /// <returns>A command to execute.</returns>
+        private Command AttackFacing(PlayerWorldState.Facing facing, PlayerWorldState.Facing noRotate, PlayerWorldState.Facing rotateRight, PlayerWorldState.Facing rotateLeft)
+        {
+            if (facing == noRotate)
+                return new Command(Command.Move.Down, true);
+            else if (facing == rotateRight)
+                return new Command(Command.Move.RotateRight, true);
+            else if (facing == rotateLeft)
+                return new Command(Command.Move.RotateLeft, true);
+            else
+                return new Command(Command.Move.RotateLeft, false);
         }
 
         /// <summary>
