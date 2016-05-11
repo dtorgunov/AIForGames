@@ -22,15 +22,13 @@ namespace GridWorld
             this.Name = "Subsumptive AI";
             this.localMap = null;
             this.dispatcher = new SubsumptionDispatch();
-            this.pathFinder = new MightyPathFinder(localMap);
-
-            // what does the ID stand for?
-            this.locationLocator = new LocationLocator(localMap, null, 0);
+            
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (unexploredExists, goToUnexplored));
 
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (seenByEnemy, moveUp));
-            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (unexploredExists, moveUp));
+            
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (singleEnemy, moveUp));
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
@@ -50,6 +48,9 @@ namespace GridWorld
                     localMap[x, y] = Cell.Unexplored;
                 }
             }
+            this.pathFinder = new MightyPathFinder(localMap);
+            // what does the ID stand for?
+            this.locationLocator = new LocationLocator(localMap, worldState.MyGridSquare, 0);
         }
 
         public override ICommand GetTurnCommands(IPlayerWorldState igrid)
@@ -138,6 +139,11 @@ namespace GridWorld
                getFacing(worldState.MyGridSquare), pathFinder);
         }
 
+        public ICommand goToUnexplored()
+        {
+            return directionToMove(locationLocator.UnexploredNode(worldState.MyGridSquare));
+        }
+
         // Helper methods
 
         public void updateMap()
@@ -178,8 +184,7 @@ namespace GridWorld
 
             cleanEnemies(e1, e2, e3);
             // make sure this is necessary
-            this.pathFinder = new MightyPathFinder(localMap);
-            locationLocator.Update(localMap, hero, 0);
+            //locationLocator.Update(localMap, hero, 0);
         }
 
         private Command directionToMove(Tuple<int, int> destination)

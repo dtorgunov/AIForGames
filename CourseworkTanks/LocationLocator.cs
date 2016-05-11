@@ -317,5 +317,119 @@ namespace GridWorld
             return new Tuple<int, int>(x, y);
         }
 
+        /// <summary>
+        /// Find a random unexplored node that is reachable (i.e. 'pathfindable' from our
+        /// current position).
+        /// </summary>
+        /// <param name="hero">The player's position</param>
+        /// <returns>The coordinates of a reachable unexplored node</returns>
+        public Tuple<int, int> UnexploredNode(GridSquare hero)
+        {
+            List<Tuple<int, int>> checkedList = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> unexplored = new List<Tuple<int, int>>();
+            Stack<Tuple<int, int>> toCheck = new Stack<Tuple<int, int>>();
+
+            Tuple<int, int> start = new Tuple<int, int>(hero.X, hero.Y);
+            toCheck.Push(start);
+            while (toCheck.Count != 0)
+            {
+                Tuple<int, int> current = toCheck.Pop();
+
+                if (checkedList.Contains(current))
+                {
+                    continue;
+                }
+
+                if (unexplored.Contains(current))
+                {
+                    continue;
+                }
+
+                if (localMap[current.Item1, current.Item2] != Cell.Unexplored)
+                {
+                    checkedList.Add(current);
+                }
+                else
+                {
+                    unexplored.Add(current);  
+                }
+
+                List<Tuple<int, int>> neightbours = GetNodeNeighbours(current);
+
+                foreach (Tuple<int, int> cell in neightbours)
+                {
+                    if (!(checkedList.Contains(cell))
+                        && !(unexplored.Contains(cell)))
+                    {
+                        toCheck.Push(cell);
+                    }
+                }
+            }
+
+            if (unexplored.Count == 0)
+            {
+                return null;
+            }
+
+            Random r = new Random();
+            return unexplored.ElementAt(r.Next(unexplored.Count));
+        }
+
+        /// <summary>
+        /// Find all the neightbours of a given node, IF that node is not unexplored
+        /// or a rock. (This method needs refining!)
+        /// </summary>
+        /// <param name="node">Coodrinates of a node to start from</param>
+        /// <returns>All neighbours of a non-unexplored node</returns>
+        private List<Tuple<int, int>> GetNodeNeighbours(Tuple<int, int> node)
+        {
+            List<Tuple<int, int>> neighbours = new List<Tuple<int, int>>();
+
+            if (localMap[node.Item1, node.Item2] != Cell.Unexplored
+             && localMap[node.Item1, node.Item2] != Cell.Rock)
+            {
+                Stack<Tuple<int, int>> potentialNeighbours
+                    = new Stack<Tuple<int, int>>();
+
+                int x = node.Item1;
+                int y = node.Item2;
+
+                potentialNeighbours.Push(new Tuple<int, int>(x+1, y));
+                potentialNeighbours.Push(new Tuple<int, int>(x-1, y));
+                potentialNeighbours.Push(new Tuple<int, int>(x, y+1));
+                potentialNeighbours.Push(new Tuple<int, int>(x, y-1));
+
+                foreach (Tuple<int, int> coor in potentialNeighbours)
+                {
+                    if (IsValidCoordinate(coor))
+                    {
+                        neighbours.Add(coor);
+                    }
+                }
+            }
+
+            return neighbours;
+        }
+
+        /// <summary>
+        /// Check if a coordinate is within the bounds of the current map
+        /// </summary>
+        /// <param name="coor">Coordinate to be checked</param>
+        /// <returns>True if coordinate is a valid index into the map array</returns>
+        private bool IsValidCoordinate(Tuple<int, int> coor)
+        {
+            if (coor.Item1 < 0 || coor.Item2 < 0)
+            {
+                return false;
+            }
+
+            if (coor.Item1 > localMap.GetLength(0) - 1
+              || coor.Item2 > localMap.GetLength(1) - 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
