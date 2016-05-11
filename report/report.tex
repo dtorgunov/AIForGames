@@ -210,7 +210,7 @@ The most significant changes are as follows:
 
 For the full listing of the pathfinding code please see section~\ref{sec:pathfindingCode}.
 
-\subsection{Actions}
+\subsection{Actions} \label{sec:actions}
 
 The actions that are carried out by the AI are dictated by the Subsumption Dispatch Table, which calls the relevant method in the class \verb|LocationLocator|, which attempts to find the best location to travel to in the given situation. This is achieved by having several methods, each relevant to one of the potental calls from the Subsumption Dispatch Table, with one being called each turn .
 
@@ -228,7 +228,7 @@ In addition, problems arouse due to unexpected errors coming from Visual Studio.
 
 As mentioned earlier in section~\ref{sec:design}, it is possible to make this AI better by, instead of providing predefined behaviour profiles, allowing for a machine learning aspect by allowing the AI to learn, throughout the game, to associate specific \verb|Situation|s with the best \verb|Action|s, as well as adjusting the priority of each binding accordingly. Genetic programming might be a good fit for such a task. However, because it is impossible to save the information on the GridWorld servers themsevles between games, it means that the AI has to learn locally, which severely limits the applicability of this approach within the given setup.
 
-The actions and predicates themselves could be further refined and optimised\footnote{George, please fill out as needed regarding the actions}.
+The actions and predicates themselves could be further refined and optimised. As detailed in section~\ref{sec:actions}, the complexity of some actions may be increased, allowing the AI to make more informed descions. With additonal refinement, this could be tested to find the right balance between runtime and complexity. \footnote{Needs rewording.}.
 
 Our approach to mapping and extracting infromation from the local map kept is, most likely, the least optimised part of the implementation. In particular, we have to loop through the whole array multiple times on each game loop iteration. Combining the tests performed into a single loop and making predicates simple accessors to the boolean fields holding the information gathered this way should make the code a lot more refined.
 
