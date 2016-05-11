@@ -231,6 +231,8 @@ The key action from the Hunter profile\footnote{Figure~\ref{fig:hunter}} is to f
 \item The \verb|MightyPathFinder| used by the AI to path to locations.
 \end{itemize}
 
+To begin with, the method calculates if it is possible to kill the oppoent this turn, proceeding to doing so if it is possible. This is achieved by checking if the AI and the opponent share either an X or a Y coordinate. 
+
 \section{Testing and Tuning}
 
 In order to test pathfinding and exploration without the oppontent AI destroying us, we have implemented a simple ``Useless'' AI, following the logic described in the lecture notes\footnote{Do we reeeeeeeeeeeally need a citation?	George says yes.}, that simply stays stationary and avoids attacking. This allowed us to safely navigate around the map and discover the bugs in the exploration part of the code\footnote{were they fixed?}.
