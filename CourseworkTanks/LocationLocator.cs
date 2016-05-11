@@ -62,45 +62,25 @@ namespace GridWorld
 
             foreach (GridNode gn in obs)
             {
-                if (gn.y == hero.Y && SimpleDodge(gn.x, gn.y, hero.X).Item1 != -1)
-                    return SimpleDodge(gn.x, gn.y, hero.X);
-                else if (gn.x == hero.X && SimpleDodge(gn.y, gn.x, hero.Y).Item1 != -1)
-                    return SimpleDodge(gn.y, gn.x, hero.Y);
+                if (gn.y == hero.Y && SimpleDodgeX(gn.x, gn.y, hero.X).Item1 != -1)
+                    return SimpleDodgeX(gn.x, gn.y, hero.X);
+                else if (gn.x == hero.X && SimpleDodgeY(gn.y, gn.x, hero.Y).Item1 != -1)
+                    return SimpleDodgeY(gn.y, gn.x, hero.Y);
                 else if (gn.y > hero.Y)
                 {
                     if (gn.y < mapWidth)
                         if (localMap[gn.x, gn.y + 1] == Cell.Empty)
                             return new Tuple<int, int>(gn.x, gn.y + 1);
-                        else if (gn.x > hero.X)
-                        {
-                            if (gn.x < mapWidth)
-                                if (localMap[gn.x + 1, gn.y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.x + 1, gn.y);
-                        }
-                        else if (gn.x < hero.X)
-                        {
-                            if (gn.x > 0)
-                                if (localMap[gn.x - 1, gn.y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.x - 1, gn.y);
-                        }
+                        else if (AdvancedDodge(gn).Item1 != -1)
+                            return AdvancedDodge(gn);
                 }
                 else if (gn.y < hero.Y)
                 {
                     if (gn.y > 0)
                         if (localMap[gn.x, gn.y - 1] == Cell.Empty)
                             return new Tuple<int, int>(gn.x, gn.y + 1);
-                        else if (gn.x > hero.X)
-                        {
-                            if (gn.x < mapWidth)
-                                if (localMap[gn.x + 1, gn.y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.x + 1, gn.y);
-                        }
-                        else if (gn.x < hero.X)
-                        {
-                            if (gn.x > 0)
-                                if (localMap[gn.x - 1, gn.y] == Cell.Empty)
-                                    return new Tuple<int, int>(gn.x - 1, gn.y);
-                        }
+                        else if (AdvancedDodge(gn).Item1 != -1)
+                            return AdvancedDodge(gn);
                 }
             }
 
@@ -108,13 +88,13 @@ namespace GridWorld
         }
 
         /// <summary>
-        /// Dodges behind a rock in one of the four cardinal directions.
+        /// Dodges behind a rock in one of the two cardinal X directions.
         /// </summary>
         /// <param name="gnMain">The axis shared with the Hero.</param>
         /// <param name="gnSec">The axis not shared with the Hero.</param>
         /// <param name="hMain">The Hero coord on the shared axis.</param>
         /// <returns>A Tuple to move to. Will contain -1, -1 if not valid.</returns>
-        private Tuple<int, int> SimpleDodge(int gnMain, int gnSec, int hMain)
+        private Tuple<int, int> SimpleDodgeX(int gnMain, int gnSec, int hMain)
         {
             if (gnMain < hMain && gnMain > 0)
                 if (localMap[gnMain - 1, gnSec] == Cell.Empty)
@@ -126,23 +106,44 @@ namespace GridWorld
             return new Tuple<int, int>(-1, -1);
         }
 
-        private Tuple<int, int> AdvancedDodge(int gnMain, int gnSec, int hMain)
+        /// <summary>
+        /// Dodges behind a rock in one of the two cardinal Y directions.
+        /// </summary>
+        /// <param name="gnMain">The axis shared with the Hero.</param>
+        /// <param name="gnSec">The axis not shared with the Hero.</param>
+        /// <param name="hMain">The Hero coord on the shared axis.</param>
+        /// <returns>A Tuple to move to. Will contain -1, -1 if not valid.</returns>
+        private Tuple<int, int> SimpleDodgeY(int gnMain, int gnSec, int hMain)
         {
-            if (gn.y < localMap.GetLength(0))
-                if (localMap[gn.x, gn.y + 1] == Cell.Empty)
-                    return new Tuple<int, int>(gn.x, gn.y + 1);
-                else if (gn.x > hero.X)
-                {
-                    if (gn.x < localMap.GetLength(0))
-                        if (localMap[gn.x + 1, gn.y] == Cell.Empty)
-                            return new Tuple<int, int>(gn.x + 1, gn.y);
-                }
-                else if (gn.x < hero.X)
-                {
-                    if (gn.x > 0)
-                        if (localMap[gn.x - 1, gn.y] == Cell.Empty)
-                            return new Tuple<int, int>(gn.x - 1, gn.y);
-                }
+            if (gnMain < hMain && gnMain > 0)
+                if (localMap[gnSec, gnMain - 1] == Cell.Empty)
+                    return new Tuple<int, int>(gnSec, gnMain - 1);
+            if (gnMain > hMain && gnMain < localMap.GetLength(1))
+                if (localMap[gnSec, gnMain + 1] == Cell.Empty)
+                    return new Tuple<int, int>(gnSec, gnMain + 1);
+
+            return new Tuple<int, int>(-1, -1);
+        }
+
+        /// <summary>
+        /// Checks if cover either above or below the player can be hidden behind on the X-axis.
+        /// </summary>
+        /// <param name="gn">The GridNode to hide behind.</param>
+        /// <returns>A Tuple to move to. Will contain -1, -1 if not valid.</returns>
+        private Tuple<int, int> AdvancedDodge(GridNode gn)
+        {
+            if (gn.x > hero.X)
+            {
+                if (gn.x < localMap.GetLength(0))
+                    if (localMap[gn.x + 1, gn.y] == Cell.Empty)
+                        return new Tuple<int, int>(gn.x + 1, gn.y);
+            }
+            else if (gn.x < hero.X)
+            {
+                if (gn.x > 0)
+                    if (localMap[gn.x - 1, gn.y] == Cell.Empty)
+                        return new Tuple<int, int>(gn.x - 1, gn.y);
+            }
 
             return new Tuple<int, int>(-1, -1);
         }

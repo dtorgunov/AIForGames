@@ -216,7 +216,7 @@ The actions that are carried out by the AI are dictated by the Subsumption Dispa
 
 One of the key actions that can be carried out under the Explorer profile\footnote{Figure~\ref{fig:explorer}} is the run away action. This allows the AI to retreat when threated by an opponent, with the action being found in the \verb|Retreat| method of the \verb|LocationLocator| class. The full source code is listed in section ~\ref{sec:coward}. This method begins by generating a \verb|List| of \verb|GridNode|s found around the player that contain an obstacle that can be hidden behind. This list is initially generated from a 3-by-3 area which is centred on the player, however this are will be expanded if no suitable hiding locations are found. Due to the increasing complexity of this algorithm upon expansion\cite{GeorgeComplex}, it is capped at an area of 5-by-5, or an additional \verb|GridNode| in each direction. If, after analysing an area of that size and finding no suitable cover, it will default to dodging in a random direction until it moves closer to something it can take cover behind.
 
-Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location.
+Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location. This is done by comparing the value of the \verb|Cell| to that of \verb|Cell.Empty|.
 
 \section{Testing and Tuning}
 
