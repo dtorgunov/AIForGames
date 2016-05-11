@@ -152,6 +152,42 @@ namespace GridWorld
             return directionToMove(dest);
         }
 
+        public ICommand lookForTrouble()
+        {
+            List<Tuple<int,int>> Enemies = new List<Tuple<int, int>>();
+
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    // if the cell contaions is an enemy tank placve in enemy list
+                    if (localMap[x, y] == Cell.Enemy1 || localMap[x, y] == Cell.Enemy2 || localMap[x, y] == Cell.Enemy3)
+                    {
+                        Enemies.Add(new Tuple<int, int>(x,y));
+                    }
+
+                }
+                int cost = int.MaxValue;
+                Tuple<int, int> ApproxClosest;
+                Tuple<int, int> HeroTank = new Tuple<int, int>(worldState.MyGridSquare.X, worldState.MyGridSquare.Y);
+
+                foreach (var tank in Enemies)
+                {
+                    if (squaredDistance(tank,HeroTank) < cost)
+                    {
+                        ApproxClosest = tank;
+                    }
+                }
+
+                pathFinder.GetPathToTarget(HeroTank);
+            }
+
+
+            return null;
+        }
+
+        
+
         // Helper methods
 
         public void updateMap()
@@ -160,7 +196,7 @@ namespace GridWorld
             playerNumber = hero.Player;
             List<GridSquare> visibleMap = worldState.MyVisibleSquares;
 
-            localMap[hero.X, hero.Y] = Cell.Hero;
+            localMap[hero.X, hero.Y] = Cell.Hero; // NEED TO CLEAR OLD LOCATION
 
             Tuple<int, int> e1 = new Tuple<int, int>(-1, -1);
             Tuple<int, int> e2 = new Tuple<int, int>(-1, -1);
@@ -220,6 +256,7 @@ namespace GridWorld
         }
 
         // potentially inefficient, think of a better way?
+        // also buggy
         private void cleanEnemies(Tuple<int, int> e1, Tuple<int, int> e2, Tuple<int, int> e3)
         {
             for (int x = 0; x < worldState.GridWidthInSquares; x++)
