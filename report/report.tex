@@ -212,7 +212,11 @@ For the full listing of the pathfinding code please see section~\ref{sec:pathfin
 
 \subsection{Actions}
 
-.\footnote{George, write something about the things you did}
+The actions that are carried out by the AI are dictated by the Subsumption Dispatch Table, which calls the relevant method in the class \verb|LocationLocator|, which attempts to find the best location to travel to in the given situation. This is achieved by having several methods, each relevant to one of the potental calls from the Subsumption Dispatch Table, with one being called each turn .
+
+One of the key actions that can be carried out under the Explorer profile\footnote{Figure~\ref{fig:explorer}} is the run away action. This allows the AI to retreat when threated by an opponent, with the action being found in the \verb|Retreat| method of the \verb|LocationLocator| class. The full source code is listed in section ~\ref{sec:coward}. This method begins by generating a \verb|List| of \verb|GridNode|s found around the player that contain an obstacle that can be hidden behind. This list is initially generated from a 3-by-3 area which is centred on the player, however this are will be expanded if no suitable hiding locations are found. Due to the increasing complexity of this algorithm upon expansion\cite{GeorgeComplex}, it is capped at an area of 5-by-5, or an additional \verb|GridNode| in each direction. If, after analysing an area of that size and finding no suitable cover, it will default to dodging in a random direction until it moves closer to something it can take cover behind.
+
+Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location.
 
 \section{Testing and Tuning}
 

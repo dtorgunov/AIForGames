@@ -57,31 +57,15 @@ namespace GridWorld
                     obs = MapObs(searchSize);
                 }
                 else
-                {
                     return RandomDodge(mapWidth, mapHeigth, threat);
-                }
             }
 
             foreach (GridNode gn in obs)
             {
-                if (gn.x == hero.Y)
-                {
-                    if (gn.x < hero.X && gn.x > 0)
-                        if (localMap[gn.x - 1, gn.y] == Cell.Empty)
-                            return new Tuple<int, int>(gn.x - 1, gn.y);
-                    if (gn.x > hero.X && gn.x < mapWidth)
-                        if (localMap[gn.x + 1, gn.y] == Cell.Empty)
-                            return new Tuple<int, int>(gn.x + 1, gn.y);
-                }
-                else if (gn.x == hero.X)
-                {
-                    if (gn.y < hero.Y && gn.y > 0)
-                        if (localMap[gn.x, gn.y - 1] == Cell.Empty)
-                            return new Tuple<int, int>(gn.x, gn.y - 1);
-                    if (gn.y > hero.Y && gn.y < mapWidth)
-                        if (localMap[gn.x, gn.y + 1] == Cell.Empty)
-                            return new Tuple<int, int>(gn.x, gn.y + 1);
-                }
+                if (gn.y == hero.Y && SimpleDodge(gn.x, gn.y, hero.X).Item1 != -1)
+                    return SimpleDodge(gn.x, gn.y, hero.X);
+                else if (gn.x == hero.X && SimpleDodge(gn.y, gn.x, hero.Y).Item1 != -1)
+                    return SimpleDodge(gn.y, gn.x, hero.Y);
                 else if (gn.y > hero.Y)
                 {
                     if (gn.y < mapWidth)
@@ -120,8 +104,47 @@ namespace GridWorld
                 }
             }
 
-            //Base case. Should never be reached.
             return RandomDodge(mapWidth, mapHeigth, threat);
+        }
+
+        /// <summary>
+        /// Dodges behind a rock in one of the four cardinal directions.
+        /// </summary>
+        /// <param name="gnMain">The axis shared with the Hero.</param>
+        /// <param name="gnSec">The axis not shared with the Hero.</param>
+        /// <param name="hMain">The Hero coord on the shared axis.</param>
+        /// <returns>A Tuple to move to. Will contain -1, -1 if not valid.</returns>
+        private Tuple<int, int> SimpleDodge(int gnMain, int gnSec, int hMain)
+        {
+            if (gnMain < hMain && gnMain > 0)
+                if (localMap[gnMain - 1, gnSec] == Cell.Empty)
+                    return new Tuple<int, int>(gnMain - 1, gnSec);
+            if (gnMain > hMain && gnMain < localMap.GetLength(0))
+                if (localMap[gnMain + 1, gnSec] == Cell.Empty)
+                    return new Tuple<int, int>(gnMain + 1, gnSec);
+
+            return new Tuple<int, int>(-1, -1);
+        }
+
+        private Tuple<int, int> AdvancedDodge(int gnMain, int gnSec, int hMain)
+        {
+            if (gn.y < localMap.GetLength(0))
+                if (localMap[gn.x, gn.y + 1] == Cell.Empty)
+                    return new Tuple<int, int>(gn.x, gn.y + 1);
+                else if (gn.x > hero.X)
+                {
+                    if (gn.x < localMap.GetLength(0))
+                        if (localMap[gn.x + 1, gn.y] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x + 1, gn.y);
+                }
+                else if (gn.x < hero.X)
+                {
+                    if (gn.x > 0)
+                        if (localMap[gn.x - 1, gn.y] == Cell.Empty)
+                            return new Tuple<int, int>(gn.x - 1, gn.y);
+                }
+
+            return new Tuple<int, int>(-1, -1);
         }
 
         /// <summary>
@@ -133,12 +156,11 @@ namespace GridWorld
         {
             List<GridNode> obs = new List<GridNode>();
 
-            //Assumes the player is not at the border of the map.
             for (int i = hero.X - size; i <= hero.X + size; i++)
             {
                 for (int j = hero.Y - size; j <= hero.Y + size; j++)
                 {
-                    if(i < localMap.GetLength(0) && i >= 0 && j < localMap.GetLength(1) && j >= 0)
+                    if(IsValidCoordinate(new Tuple<int, int>(i, j)))
                         if (localMap[i, j] == Cell.Rock)
                             obs.Add(new GridNode(i, j, Cell.Rock));
                 }
@@ -169,12 +191,18 @@ namespace GridWorld
             else
                 yDiff = Math.Abs(t.Y - hero.Y);
 
-            if (xDiff < yDiff) //Closer on the x-axis, dodge vertically
+            if (xDiff < yDiff)          //Closer on the x-axis, dodge vertically
                 return Dodge(0, 1);
-            else //Closer on the y-axis
+            else                        //Closer on the y-axis, dodge horizontally
                 return Dodge(1, 0);
         }
 
+        /// <summary>
+        /// Determines where to dodge.
+        /// </summary>
+        /// <param name="xAdd">How far to look in the X-direction.</param>
+        /// <param name="yAdd">How far to look in the Y-direction.</param>
+        /// <returns>A Tuple with the coordinates of the destination.</returns>
         private Tuple<int, int> Dodge(int xAdd, int yAdd)
         {
             Random r = new Random();
