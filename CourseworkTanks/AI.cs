@@ -23,16 +23,17 @@ namespace GridWorld
             this.localMap = null;
             this.dispatcher = new SubsumptionDispatch();
             
-            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+            /*dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (unexploredExists, goToUnexplored));
 
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (seenByEnemy, moveUp));
             
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (singleEnemy, moveUp));
+                (singleEnemy, moveUp));*/
+
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (SubsumptionDispatch.defaultAction, moveUp));
+                (SubsumptionDispatch.defaultAction, moveToAPlace));
         }
 
         private void initMap() {
@@ -126,6 +127,12 @@ namespace GridWorld
             return new Command(Command.Move.Up, true);
         }
 
+        public ICommand moveToAPlace()
+        {
+            Tuple<int, int> aPlace = new Tuple<int, int>(2, 0);
+            return directionToMove(aPlace);
+        }
+
         public ICommand runAway()
         {
             GridSquare enemy = getClosestEnemy();
@@ -141,7 +148,8 @@ namespace GridWorld
 
         public ICommand goToUnexplored()
         {
-            return directionToMove(locationLocator.UnexploredNode(worldState.MyGridSquare));
+            Tuple<int, int> dest = locationLocator.UnexploredNode(worldState.MyGridSquare);
+            return directionToMove(dest);
         }
 
         // Helper methods
@@ -193,15 +201,15 @@ namespace GridWorld
             GridSquare hero = worldState.MyGridSquare;
 
             GridNode nextMove = path.ElementAt(0);
-            if (nextMove.X > hero.X)
+            if (nextMove.x > hero.X)
             {
                 return new Command(Command.Move.Right, false);
             }
-            else if (nextMove.X < hero.X)
+            else if (nextMove.x < hero.X)
             {
                 return new Command(Command.Move.Left, false);
             }
-            else if (nextMove.Y > hero.Y)
+            else if (nextMove.y > hero.Y)
             {
                 return new Command(Command.Move.Up, false);
             }

@@ -10,9 +10,6 @@ namespace GridWorld
         GridNode[,] InternalNodeMap;
         Cell[,] InternalCellMap;
         GridNode Hero;
-        GridNode Target;
-
-     
 
         public MightyPathFinder(Cell[,] ICM)
         {
@@ -29,124 +26,137 @@ namespace GridWorld
             {
                 for (int y = 0; y < InternalCellMap.GetLength(1); y++)
                 {
-
-
                     InternalNodeMap[x, y] = new GridNode(x, y, InternalCellMap[x, y]);
 
                     if (InternalCellMap[x, y] == Cell.Hero)
                     {
                         Hero = InternalNodeMap[x, y];
-
                     }
-                   
-                }//End of Y 
-            }// End of X 
-
+                }
+            }
         }
 
         private List<GridNode> GetNeighbours(GridNode node)
         {
+
+            // to account for impassable cells, we say that an unwalkable cell has no neighbours
+            // therefore it will never be part of a path, other than as the goal
+            if (!node.walkable)
+            {
+                return new List<GridNode>();
+            }
+
             List<GridNode> neighbours = new List<GridNode>();
 
-            for (int x = 0; x < InternalNodeMap.GetLength(0); x++)
+            Stack<Tuple<int, int>> potentialNeighbours
+                    = new Stack<Tuple<int, int>>();
+
+            int x = node.x;
+            int y = node.y;
+
+            potentialNeighbours.Push(new Tuple<int, int>(x - 1, y));
+            potentialNeighbours.Push(new Tuple<int, int>(x + 1, y));
+            potentialNeighbours.Push(new Tuple<int, int>(x, y - 1));
+            potentialNeighbours.Push(new Tuple<int, int>(x, y + 1));
+
+            foreach (Tuple<int, int> coor in potentialNeighbours)
             {
-                for (int y = 0; y < InternalNodeMap.GetLength(1); y++)
+                if (IsValidCoordinate(coor))
                 {
-                    if (InternalNodeMap[x, y].Y == node.Y && InternalNodeMap[x, y].X == node.X)
-                    {
-                        if (x >= 1)
-                            neighbours.Add(InternalNodeMap[x - 1, y]);
-                        if (y >= 1)
-                            neighbours.Add(InternalNodeMap[x, y - 1]);
-                        if (x <= InternalNodeMap.GetLength(0) - 2)
-                            neighbours.Add(InternalNodeMap[x + 1, y]);
-                        if (y <= InternalNodeMap.GetLength(0) - 2)
-                            neighbours.Add(InternalNodeMap[x, y + 1]);
-                    }
+                    neighbours.Add(InternalNodeMap[coor.Item1, coor.Item2]);
                 }
             }
             return neighbours;
         }
 
-        int Heuristic(GridNode current, GridNode target)
+        private bool IsValidCoordinate(Tuple<int, int> coor)
         {
-            int dx = Math.Abs(current.X - target.X);
-            int dy = Math.Abs(current.Y - target.Y);
+            if (coor.Item1 < 0 || coor.Item2 < 0)
+            {
+                return false;
+            }
 
-                return 10 * (dx + dy);
+            if (coor.Item1 > InternalNodeMap.GetLength(0) - 1
+              || coor.Item2 > InternalNodeMap.GetLength(1) - 1)
+            {
+                return false;
+            }
+
+            return true;
         }
 
+        private int heuristic(GridNode node, GridNode goal)
+        {
+            int dx = Math.Abs(node.x - goal.x);
+            int dy = Math.Abs(node.y - goal.y);
+
+            return dx + dy;
+        }
 
 
         public List<GridNode> GetPathToTarget(Tuple<int, int> TupleNode){
 
+            ConvertToGridNodeArray(InternalCellMap);
+
             List<GridNode> open = new List<GridNode>();
             List<GridNode> closed = new List<GridNode>();
 
-            Target = InternalNodeMap[TupleNode.Item1, TupleNode.Item2];
+            GridNode Target = InternalNodeMap[TupleNode.Item1, TupleNode.Item2];
 
             open.Add(Hero);
 
             while (open.Count > 0)
             {
 
+                open = open.OrderBy(n => n.fCost).ToList(); // treat as priority queue
                 GridNode current = open[0];
-
-                for (int i = 1; i < open.Count; i++)
-                {
-
-                    if (open[i].GetFCost() < current.GetFCost() || open[i].GetFCost() == current.GetFCost() && open[i].GetHCost() < current.GetHCost())
-                    {
-                        current = open[i];
-                    }
-
-                 }
-
                 open.Remove(current);
                 closed.Add(current);
 
                 if (current == Target)
                 {
-                    //found target
-
                     List<GridNode> path = new List<GridNode>();
-                    GridNode retrace = Hero;
 
-                    while (retrace != current && retrace != null)
+                    while (current != null)
                     {
-                        if (retrace.GetParent() == null)
-                             break;
-                        path.Add(retrace);
-                        retrace = retrace.GetParent();
+                        path.Add(current);
+                        current = current.parent;
                     }
 
-                    return path;
+                    // reverse the path
+                    List<GridNode> properPath = new List<GridNode>();
+                    foreach (var node in path)
+                    {
+                        properPath.Add(node);
+                    }
+
+                    return properPath;
                 }
 
                  List<GridNode> neighbours = GetNeighbours(current);
-                    foreach (GridNode n in neighbours)
+                    foreach (var n in neighbours)
                     {
-                        if (n.GetWalkable() && !closed.Contains(n))
+                        int cost = current.gCost + 1; // assume movement cost is always 1 (even terrain)
+
+                        // .Contains() should be fine, as we're getting all nodes from the array above,
+                        // so the node at the same position should have the same address. If this causes
+                        // issues, override .Equals()
+                        if (open.Contains(n) && cost < n.gCost)
                         {
-                            int newMovementCost = current.GetGCost() + Heuristic(current, n);
-                            if (newMovementCost < n.GetGCost() || !open.Contains(n))
-                            {
-                                n.SetGCost(newMovementCost);
-                                n.SetHCost(Heuristic(n, Target));
-                                n.SetParent(current);
-                                if (!open.Contains(n))
-                                    open.Add(n);
-                            }
+                            open.Remove(n);
+                        }
+
+                        if (!open.Contains(n) && !closed.Contains(n)) {
+                            n.gCost = cost;
+                            n.hCost = heuristic(n, Target);
+                            n.parent = current;
+                            open.Add(n);
                         }
                     }
                 }
-
-
             
-            
+            // no path available
             return new List<GridNode>();
-
         }
-
     }
 }
