@@ -17,6 +17,7 @@ namespace GridWorld
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
         /// <param name="hero">Location of the player.</param>
+        /// <param name="id">The ID of the player.</param>
         public LocationLocator(Cell[,] localMap, GridSquare hero, int id)
         {
             Update(localMap, hero, id);
@@ -27,6 +28,7 @@ namespace GridWorld
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
         /// <param name="hero">Location of the player.</param>
+        /// <param name="id">The ID of the player.</param>
         public void Update(Cell[,] localMap, GridSquare hero, int id)
         {
             this.localMap = localMap;
@@ -168,36 +170,27 @@ namespace GridWorld
                 yDiff = Math.Abs(t.Y - hero.Y);
 
             if (xDiff < yDiff) //Closer on the x-axis, dodge vertically
-            {
-                if (localMap[hero.X, hero.Y + 1] != Cell.Rock && localMap[hero.X, hero.Y - 1] != Cell.Rock)
-                {
-                    if (r.Next(2) == 0)
-                        return new Tuple<int, int>(hero.X, hero.Y + 1);
-                    else
-                        return new Tuple<int, int>(hero.X, hero.Y - 1);
-                }
-                if (localMap[hero.X, hero.Y + 1] == Cell.Rock && localMap[hero.X, hero.Y - 1] != Cell.Rock)
-                    return new Tuple<int, int>(hero.X, hero.Y - 1);
-                if (localMap[hero.X, hero.Y - 1] == Cell.Rock && localMap[hero.X, hero.Y + 1] != Cell.Rock)
-                    return new Tuple<int, int>(hero.X, hero.Y + 1);
-            }
+                return Dodge(0, 1);
             else //Closer on the y-axis
-            {
-                if (localMap[hero.X + 1, hero.Y] != Cell.Rock && localMap[hero.X - 1, hero.Y] != Cell.Rock)
-                {
-                    if (r.Next(2) == 0)
-                        return new Tuple<int, int>(hero.X + 1, hero.Y);
-                    else
-                        return new Tuple<int, int>(hero.X - 1, hero.Y);
-                }
-                if (localMap[hero.X + 1, hero.Y] == Cell.Rock && localMap[hero.X - 1, hero.Y] != Cell.Rock)
-                    return new Tuple<int, int>(hero.X, hero.Y - 1);
-                if (localMap[hero.X - 1, hero.Y] == Cell.Rock && localMap[hero.X + 1, hero.Y] != Cell.Rock)
-                    return new Tuple<int, int>(hero.X, hero.Y + 1);
-            }
+                return Dodge(1, 0);
+        }
 
-            //Base Case - used if no easy dodges are avalible to the AI, chooses a location to pathfind to.
-            return RandomKnown(w, h);
+        private Tuple<int, int> Dodge(int xAdd, int yAdd)
+        {
+            Random r = new Random();
+            if (localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock)
+            {
+                if (r.Next(2) == 0)
+                    return new Tuple<int, int>(hero.X + xAdd, hero.Y + yAdd);
+                else
+                    return new Tuple<int, int>(hero.X - xAdd, hero.Y - yAdd);
+            }
+            if (localMap[hero.X + xAdd, hero.Y + yAdd] == Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock)
+                return new Tuple<int, int>(hero.X - xAdd, hero.Y - yAdd);
+            if (localMap[hero.X, hero.Y - yAdd] == Cell.Rock && localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock)
+                return new Tuple<int, int>(hero.X + xAdd, hero.Y + yAdd);
+
+            return RandomKnown(localMap.GetLength(0), localMap.GetLength(0));
         }
 
         /// <summary>

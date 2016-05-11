@@ -53,7 +53,7 @@ namespace GridWorld
             }
             this.pathFinder = new MightyPathFinder(localMap);
             // what does the ID stand for?
-            this.locationLocator = new LocationLocator(localMap, worldState.MyGridSquare, 0);
+            this.locationLocator = new LocationLocator(localMap, worldState.MyGridSquare, this.ID);
         }
 
         public override ICommand GetTurnCommands(IPlayerWorldState igrid)
