@@ -218,13 +218,18 @@ The actions that are carried out by the AI are dictated by the Subsumption Dispa
 
 One of these key actions that can be carried out under the Explorer profile\footnote{Figure~\ref{fig:explorer}} is the run away action. This allows the AI to retreat when threated by an opponent, with the action being found in the \verb|Retreat| method of the \verb|LocationLocator| class. The full source code is listed in section~\ref{sec:coward}. This method begins by generating a \verb|List| of \verb|GridNode|s found around the player that contain an obstacle that can be hidden behind. This list is initially generated from a 3-by-3 area which is centred on the player, however this are will be expanded if no suitable hiding locations are found. Due to the increasing complexity of this algorithm upon expansion\cite{GeorgeComplex}, it is capped at an area of 5-by-5, or an additional \verb|GridNode| in each direction. If, after analysing an area of that size and finding no suitable cover, it will default to dodging in a random direction until it moves closer to something it can take cover behind.
 
-Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location. This is done by comparing the value of the \verb|Cell| to that of \verb|Cell.Empty|. Initally, this is done by looking at any obstacles in the four cardinal directions within GridWorld\footnote{Up, Down, Left and Right} and check the side opposite the player. If the these locations are not valid, or if no obstacles exist in these positions, the AI checks the corner \verb|Cell|s. These can potentionally have two seperate locations that the tank can hidden, so both the furtherest X and Y locations\footnote{Relative to the player} must be checked. Again, if there is a valid location to move to and hide at, it will do so, but if there is not then the AI defaults back to the \verb|RandomDodge| method.
+Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location. This is done by comparing the value of the \verb|Cell| to that of \verb|Cell.Empty|. Initally, this is done by looking at any obstacles in the four cardinal directions within GridWorld (Up, Down, Left and Right) and check the side opposite the player. If the these locations are not valid, or if no obstacles exist in these positions, the AI checks the corner \verb|Cell|s. These can potentionally have two seperate locations that the tank can hidden, so both the furtherest X and Y locations (Relative to the player) must be checked. Again, if there is a valid location to move to and hide at, it will do so, but if there is not then the AI defaults back to the \verb|RandomDodge| method.
 
-\verb|RandomDodge, which is used when no hidding places are found close to the player, works to determine to where the player should move. The randomness is include so that, if there are multiple moves possible at a given time, it will choose one that is
+\verb|RandomDodge|, which is used when no hidding places are found close to the player, works to determine to where the player should move. The randomness is include so that, if there are multiple moves possible at a given time, it will choose one that is cannot be predicted. This behaviour is often seen in video games\cite{GeorgeRandom}, as it can lead to unexpected events occuring for the player, although it is also helpful in this scenario as it enables the AI to be slightly unprodictable, potentally dealing with opponents that implemtent machine learning.
 
 \subsubsection{Attacking}
 
-Another 
+The key action from the Hunter profile\footnote{Figure~\ref{fig:hunter}} is to find and kill the opponent. This action is carried out in the \verb|Attack| method, which accepts the following arguements:
+\begin{itemize}
+\item The \verb|GridSquare| that contains the opponent to attack.
+\item A \verb|PlayerWorldState.Facing| that represents the direction the AI is facing.
+\item The \verb|MightyPathFinder| used by the AI to path to locations.
+\end{itemize}
 
 \section{Testing and Tuning}
 
