@@ -13,12 +13,19 @@ namespace GridWorld
         private int playerNumber;
         private SubsumptionDispatch dispatcher;
 
+        private MightyPathFinder pathFinder;
+        private LocationLocator locationLocator;
+
         public dtorguno()
             : base()
         {
             this.Name = "Subsumptive AI";
             this.localMap = null;
             this.dispatcher = new SubsumptionDispatch();
+            this.pathFinder = new MightyPathFinder(localMap);
+
+            // what does the ID stand for?
+            this.locationLocator = new LocationLocator(localMap, null, 0);
 
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (seenByEnemy, moveUp));
@@ -118,6 +125,19 @@ namespace GridWorld
             return new Command(Command.Move.Up, true);
         }
 
+        public ICommand runAway()
+        {
+            GridSquare enemy = getClosestEnemy();
+            Tuple<int, int> goHere = locationLocator.Retreat(enemy);
+            return directionToMove(goHere);
+        }
+
+        public ICommand engageEnemy()
+        {
+            return locationLocator.Attack(getClosestEnemy(),
+               getFacing(worldState.MyGridSquare), pathFinder);
+        }
+
         // Helper methods
 
         public void updateMap()
@@ -157,6 +177,33 @@ namespace GridWorld
             }
 
             cleanEnemies(e1, e2, e3);
+            // make sure this is necessary
+            this.pathFinder = new MightyPathFinder(localMap);
+            locationLocator.Update(localMap, hero, 0);
+        }
+
+        private Command directionToMove(Tuple<int, int> destination)
+        {
+            List<GridNode> path = pathFinder.GetPathToTarget(destination);
+            GridSquare hero = worldState.MyGridSquare;
+
+            GridNode nextMove = path.ElementAt(0);
+            if (nextMove.X > hero.X)
+            {
+                return new Command(Command.Move.Right, false);
+            }
+            else if (nextMove.X < hero.X)
+            {
+                return new Command(Command.Move.Left, false);
+            }
+            else if (nextMove.Y > hero.Y)
+            {
+                return new Command(Command.Move.Up, false);
+            }
+            else
+            {
+                return new Command(Command.Move.Down, false);
+            }
         }
 
         // potentially inefficient, think of a better way?

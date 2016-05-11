@@ -260,18 +260,17 @@ namespace GridWorld
                 }
             }
 
-            /* Uncomment me when the PathFinding is synced with this branch.
             GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y)).ElementAt(0);
 
             if (travel.X > hero.X)
-                return new Command(Command.Move.Left, false);
-            else if (travel.X < hero.X)
                 return new Command(Command.Move.Right, false);
+            else if (travel.X < hero.X)
+                return new Command(Command.Move.Left, false);
             else if (travel.Y > hero.Y)
                 return new Command(Command.Move.Up, false);
             else
                 return new Command(Command.Move.Down, false);
-            */
+            
         }
 
         /// <summary>
