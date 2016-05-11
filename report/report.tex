@@ -51,7 +51,7 @@ AI For Games Coursework Submission (Tanks)}
 \section{Introduction}
 This report details the implementation of a subsumption-based AI, as developed by the group ``Team \(-i^2\)''.\footnote{Refine and add abstract}
 
-\section{AI Design} \label{sec:design}
+\section{AI Design and Implementation} \label{sec:design}
 
 The AI produced by our group for this coursework focuses on utilising a subsumption architecture, inspired by the work done by one of the group members in the context of intelligent robotics. The subsumptive architecture, as proposed by Brooks, aims to form close connections between sensory inputs and behaviours of an intelligent agent\cite{brooks1}. In the context of an intelligent Tanks player, we can take information gleamed from the state of the map as simulating sensory inputs, and define a series of behaviours (such as running away, exploring, or seeking an enemy) to take in specific situtations. This approach lends itself well to group work, as individual components and behaviours can be developed separately, and then combined in arbitrairly complex ways using the subsumption architecture.
 
@@ -183,7 +183,21 @@ At present, we adopt the Explorer profile if the average score gain for discover
 \end{landscape}
 }
 
+\subsection{Mapping and Pathfinding}
+
+In order to make it easier to navigate and seek out enemies, we keep track not only of the visible area, but also of the overall map explored so far.  To that end, we have defined a \verb|Cell| enum. We keep and update an array of \verb|Cell|s, filling it with the ``visible'' information on each turn. 
+
+We also keep track of the last place we saw enemy tanks, to make it easier to avoid or chase them later. This means that we also have to ``prune'' the map every so often, making sure there is at most one instance of each enemy (the one we saw most recently). For more details, please see section~\ref{sec:aiCode}.
+
+.\footnote{Connor, please write the pathfinding bit here}
+
+\subsection{Actions}
+
+.\footnote{George, write something about the things you did}
+
 \section{Testing and Tuning}
+.\footnote{Write about the weird errors here? Because of reasons}
+
 \section{Recommendations for Future Work} \label{sec:futureWork}
 
 As mentioned earlier in section~\ref{sec:design}, it is possible to make this AI better by, instead of providing predefined behaviour profiles, allowing for a machine learning aspect by allowing the AI to learn, throughout the game, to associate specific \verb|Situation|s with the best \verb|Action|s, as well as adjusting the priority of each binding accordingly. Genetic programming might be a good fit for such a task. However, because it is impossible to save the information on the GridWorld servers themsevles between games, it means that the AI has to learn locally, which severely limits the applicability of this approach within the given setup.
