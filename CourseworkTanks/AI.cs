@@ -23,19 +23,17 @@ namespace GridWorld
             this.localMap = null;
             this.dispatcher = new SubsumptionDispatch();
 
-            WriteTrace("Huh?");
-            
-            /*dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (unexploredExists, goToUnexplored));
 
-            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+            /*dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (seenByEnemy, moveUp));
             
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
                 (singleEnemy, moveUp));*/
 
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (SubsumptionDispatch.defaultAction, goToUnexplored));
+                (SubsumptionDispatch.defaultAction, moveUp));
         }
 
         private void initMap() {
@@ -80,6 +78,7 @@ namespace GridWorld
                 {
                     if (localMap[x, y] == Cell.Unexplored)
                     {
+                        WriteTrace("Unexplored node exists!");
                         return true;
                     }
                 }
@@ -152,6 +151,7 @@ namespace GridWorld
         public ICommand goToUnexplored()
         {
             Tuple<int, int> dest = locationLocator.UnexploredNode(worldState.MyGridSquare);
+            WriteTrace("Moving to " + dest.Item1 + "," + dest.Item2);
             return explorationMove(dest);
         }
 
@@ -182,7 +182,7 @@ namespace GridWorld
                     }
                 }
 
-                pathFinder.GetPathToTarget(HeroTank);
+                //pathFinder.GetPathToTarget(HeroTank);
             }
 
 
@@ -281,10 +281,11 @@ namespace GridWorld
 
         private Command.Move directionToMove(Tuple<int, int> destination)
         {
-            List<GridNode> path = pathFinder.GetPathToTarget(destination);
+            List<GridNode> path = pathFinder.GetPathToTarget(destination, worldState.MyGridSquare);
             GridSquare hero = worldState.MyGridSquare;
 
-            GridNode nextMove = path.ElementAt(0);
+            GridNode nextMove = path.ElementAt(1);
+            WriteTrace("Next move: " + nextMove.x + "," + nextMove.y);
             if (nextMove.x > hero.X)
             {
                 return Command.Move.Right;
