@@ -51,7 +51,7 @@ AI For Games Coursework Submission (Tanks)}
 \section{Introduction}
 This report details the implementation of a subsumption-based AI, as developed by the group ``Team \(-i^2\)''.\footnote{Refine and add abstract}
 
-\section{AI Design}
+\section{AI Design} \label{sec:design}
 
 The AI produced by our group for this coursework focuses on utilising a subsumption architecture, inspired by the work done by one of the group members in the context of intelligent robotics. The subsumptive architecture, as proposed by Brooks, aims to form close connections between sensory inputs and behaviours of an intelligent agent\cite{brooks1}. In the context of an intelligent Tanks player, we can take information gleamed from the state of the map as simulating sensory inputs, and define a series of behaviours (such as running away, exploring, or seeking an enemy) to take in specific situtations. This approach lends itself well to group work, as individual components and behaviours can be developed separately, and then combined in arbitrairly complex ways using the subsumption architecture.
 
@@ -99,7 +99,9 @@ As soon as the \verb|Action| whose \verb|Situation| predicate returns true is fo
 
 We consider two possible behaviour profiles for is AI: the Hunter and the Explorer. The goal of the game it to maximise the score, and the behaviour process aims to do so in the most efficient way. If exploration is more valuable, point-wise, than killing opponents, we can utilise the Explorer profile, which focuses primarily on discovering the map and avoiding confrontation. On the other hand, if the amount of points received for killing an enemy is higher than the amount of points gained (on average) through exploration, we utilise the Hunter profile, which will actively seek to destroy enemy tanks.
 
-Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter\footnote{add hunter}.
+Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.
+
+At present, we adopt the Explorer profile if the average score gain for discovering a rock or empty cell is larger than the score gain for destroying an enemy. This could be further improved, however appears to be a good ``ball-park'' metric.
 
 \afterpage{
 \clearpage
@@ -108,7 +110,7 @@ Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\r
 \begin{figure}[h]
   \centering
   \begin{tikzpicture}[node distance=2cm, auto]
-    \node[situation] (enemy) {Enemy sighted};
+    \node[situation] (enemy) {Can be seen by enemy};
     \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
     \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(=\) 1};
     \node[situation,below=0.5em of singleEnemy] (default) {Default action};
@@ -145,13 +147,13 @@ Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\r
   \centering
   \begin{tikzpicture}[node distance=2cm, auto]
     \node[situation] (enemy) {Enemy sighted};
-    \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
-    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(=\) 1};
+    \node[situation,below=0.5em of enemy] (unexploredNode) {Enemies exist};
+    \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Unexplored nodes exist};
     \node[situation,below=0.5em of singleEnemy] (default) {Default action};
 
-    \node[action,right=3em of enemy] (runAway) {Run away};
-    \node[action,right=3em of unexploredNode] (headTo) {Head to node};
-    \node[action,right=3em of singleEnemy] (engage) {Engage enemy};
+    \node[action,right=3em of enemy] (runAway) {Engage};
+    \node[action,right=3em of unexploredNode] (headTo) {Seek enemy};
+    \node[action,right=3em of singleEnemy] (engage) {Head to node};
 
     \node[right=5.5em of engage] (anchorPoint) {};
     
@@ -183,7 +185,17 @@ Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\r
 
 \section{Testing and Tuning}
 \section{Recommendations for Future Work} \label{sec:futureWork}
-.\footnote{Make sure to discuss improvements to GridWorld (i.e. information storage)}
+
+As mentioned earlier in section~\ref{sec:design}, it is possible to make this AI better by, instead of providing predefined behaviour profiles, allowing for a machine learning aspect by allowing the AI to learn, throughout the game, to associate specific \verb|Situation|s with the best \verb|Action|s, as well as adjusting the priority of each binding accordingly. Genetic programming might be a good fit for such a task. However, because it is impossible to save the information on the GridWorld servers themsevles between games, it means that the AI has to learn locally, which severely limits the applicability of this approach within the given setup.
+
+The actions and predicates themselves could be further refined and optimised\footnote{George, please fill out as needed regarding the actions}.
+
+Our approach to mapping and extracting infromation from the local map kept is, most likely, the least optimised part of the implementation. In particular, we have to loop through the whole array multiple times on each game loop iteration. Combining the tests performed into a single loop and making predicates simple accessors to the boolean fields holding the information gathered this way should make the code a lot more refined.
+
+Finally, the pathfinding algorithm, as presented in the code, computes the path anew on each loop iteration. If the target cell has not changed, and there is no change in \verb|Situation|, it should be possible to cache the path initially computed, and simply continue moving as needed, greatly reducing the work done on each game loop iteration\footnote{Connor, please make sure this is right}.
+
+\subsection{GridWorld Recommendations}
+As mentioned above, the main element that we found missing in both this and the previous coursework submission for this module is the ability to retain information between runs on the GridWorld server. If each user was allocated a small amount of storage on the server, or a way to redirect some form of data to a text or binary file that could then be retrieved, it would be possible to view the server as a dynamic learning environment, broadening the applicability of machine learning approaches.
 \section{Conclusions}
 
 \newpage
@@ -196,5 +208,6 @@ Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\r
 \appendix
 
 \section{Evidence of Group Work}
+Throughout this project's development, Github has been used in order to synchronise our work and communicate issues. Below, we list the final log of git contributions, showing that all the group members have contributed. Note that, on average, people with less commits had more code added per commit.\footnote{Add git logs when done}
 \section{Source code}
 \end{document}
