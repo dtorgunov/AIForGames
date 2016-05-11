@@ -99,7 +99,7 @@ As soon as the \verb|Action| whose \verb|Situation| predicate returns true is fo
 
 We consider two possible behaviour profiles for is AI: the Hunter and the Explorer. The goal of the game it to maximise the score, and the behaviour process aims to do so in the most efficient way. If exploration is more valuable, point-wise, than killing opponents, we can utilise the Explorer profile, which focuses primarily on discovering the map and avoiding confrontation. On the other hand, if the amount of points received for killing an enemy is higher than the amount of points gained (on average) through exploration, we utilise the Hunter profile, which will actively seek to destroy enemy tanks.
 
-Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.
+Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.\footnote{refine the diagrams}
 
 At present, we adopt the Explorer profile if the average score gain for discovering a rock or empty cell is larger than the score gain for destroying an enemy. This could be further improved, however appears to be a good ``ball-park'' metric.
 
@@ -189,7 +189,7 @@ In order to make it easier to navigate and seek out enemies, we keep track not o
 
 We also keep track of the last place we saw enemy tanks, to make it easier to avoid or chase them later. This means that we also have to ``prune'' the map every so often, making sure there is at most one instance of each enemy (the one we saw most recently). For more details, please see section~\ref{sec:aiCode}.
 
-.\footnote{Connor, please write the pathfinding bit here}
+.\footnote{Connor, please write the pathfinding bit here, also mention the improvements made and cite ourselves}
 
 \subsection{Actions}
 
@@ -197,6 +197,7 @@ We also keep track of the last place we saw enemy tanks, to make it easier to av
 
 \section{Testing and Tuning}
 .\footnote{Write about the weird errors here? Because of reasons}
+.\footnote{Mention the derp-tank}
 
 \section{Recommendations for Future Work} \label{sec:futureWork}
 
