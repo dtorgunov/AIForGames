@@ -189,15 +189,30 @@ In order to make it easier to navigate and seek out enemies, we keep track not o
 
 We also keep track of the last place we saw enemy tanks, to make it easier to avoid or chase them later. This means that we also have to ``prune'' the map every so often, making sure there is at most one instance of each enemy (the one we saw most recently). For more details, please see section~\ref{sec:aiCode}.
 
-.\footnote{Connor, please write the pathfinding bit here, also mention the improvements made and cite ourselves}
+The pathfinding algorithm we use is a refined and improved version of the A* implementation used in our previous coursework submission\cite{theGloriousWe}. We have cleaned up the \verb|GridNode| class, making it more streamlined, smaller and easier to use by removing redundant accessor functions. Since the class is only ever used within the project and no pre-processing of parameters is necessary, and no guarded conditions exist that could be expressed via setters, we simply made the relevant fields public. The only exception is \verb|GridNode.fCost|, which has been replacted with a getter that simply returns the relevant value based on the other parameters. This reduces the risk of \verb|GridNode.fCost| not being update properly by mistake.
+
+In addition, we also have completely restructured the main pathfinding logic, in order to remove errors previously present. We have levereged what we have learned while implementing the first iteration\cite{theGloriousWe} and improved on the main shortcomings.
+
+The most significant changes are as follows:
+
+\begin{itemize}
+\item Fixed an issue which caused the \verb|GridNode.fCost| be set inconsistantly while constructing the list of neighbours.
+\item Fixed an issue where the path returned is not gaurenteed to be the shortest path as some \verb|GridNode|s where skipped unnecessarily.
+\item Optimised the implementation by sorting the list to act as a priority queue, potentially reducing CPU time (depending on the native .NET sort implementation)
+\item Made code more readable by using a stack when listing neighbours and looping through its contents instead of considering each neighbour explicitly when testing whether a coordinate is withing the bounds of the board array, as well as reducing complexity, as previously a nested loop was used
+\end{itemize}
+
+For the full listing of the pathfinding code please see section~\ref{sec:pathfindingCode}.
 
 \subsection{Actions}
 
 .\footnote{George, write something about the things you did}
 
 \section{Testing and Tuning}
-.\footnote{Write about the weird errors here? Because of reasons}
-.\footnote{Mention the derp-tank}
+
+In order to test pathfinding and exploration without the oppontent AI destroying us, we have implemented a simple ``Useless'' AI, following the logic described in the lecture notes\footnote{Do we reeeeeeeeeeeally need a citation?}, that simply stays stationary and avoids attacking. This allowed us to safely navigate around the map and discover the bugs in the exploration part of the code\footnote{were they fixed?}.
+
+In addition, problems arouse due to unexpected errors coming from Visual Studio. Firstly, we got errors trying to load the (standard) \verb|Tuple| class, so we have implemented our own, adhereing to the same naming conventions for elements, to make it interoperate with the code already written. Furthermore, more such errors appeared as more code was added. Eventually, we have decided to try changing the .NET framework version, and while that seemed to resolve the issue, it gave us cryptic warning that we did not have time to investigate in details and that might account for some of the bugs.
 
 \section{Recommendations for Future Work} \label{sec:futureWork}
 
