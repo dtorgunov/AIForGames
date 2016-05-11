@@ -113,110 +113,14 @@ namespace GridWorld
             return worldState.CanSee(enemyFacing, enemy.X, enemy.Y, myX, myY, gs);
         }
 
-        private GridSquare getClosestEnemy()
-        {
-            List<GridSquare> visible = worldState.MyVisibleSquares;
-            GridSquare enemySquare = null;
-            Tuple<int, int> enemy = null;
-            GridSquare hero = worldState.MyGridSquare;
-            foreach (GridSquare square in visible)
-            {
-                if (!isTank(square))
-                {
-                    continue;
-                }
-
-                if (square.X == hero.X && square.Y == hero.Y)
-                {
-                    continue;
-                }
-
-                // this is a tank which is not the hero
-                if (enemy == null)
-                {
-                    // first tank found
-                    enemy = new Tuple<int, int>(square.X, square.Y);
-                    enemySquare = square;
-                }
-                else
-                {
-                    // another tank exists, keep the closes one
-                    Tuple<int, int> enemy2 = new Tuple<int, int>(square.X, square.Y);
-                    Tuple<int, int> h = new Tuple<int, int>(hero.X, hero.Y);
-                    enemy = closest(h, enemy, enemy2);
-                    if (enemy.Equals(enemy2))
-                    {
-                        enemySquare = square;
-                    }
-                }
-            }
-            return enemySquare;
-        }
-
-        private Tuple<int, int> closest(Tuple<int, int> h, Tuple<int, int> p, Tuple<int, int> q)
-        {
-            // Use squared Euclidean distance, as it is good enough and quicker to compute
-            if (squaredDistance(h, p) >= squaredDistance(h, q))
-            {
-                return p;
-            }
-            else
-            {
-                return q;
-            }
-        }
-
-        private int squaredDistance(Tuple<int, int> p, Tuple<int, int> q)
-        {
-            int deltaX = q.Item1 - p.Item1;
-            int deltaY = q.Item2 - p.Item2;
-            return deltaX * deltaX + deltaY * deltaY;
-        }
-
-        private bool isTank(GridSquare s)
-        {
-            return (s.Contents == GridSquare.ContentType.TankDown)
-                || (s.Contents == GridSquare.ContentType.TankUp)
-                || (s.Contents == GridSquare.ContentType.TankLeft)
-                || (s.Contents == GridSquare.ContentType.TankRight);
-        }
-        private GridSquare[,] fromLocalMap()
-        {
-            GridSquare[,] gs = new GridSquare[localMap.GetLength(0),localMap.GetLength(1)];
-            for (int x = 0; x < localMap.GetLength(0); x++)
-            {
-                for (int y = 0; y < localMap.GetLength(1); y++)
-                {
-                    gs[x,y] = convertFromCell(localMap[x, y], x, y);
-                }
-            }
-
-            return gs;
-        }
-
-        // assumes there is a tank there
-        private PlayerWorldState.Facing getFacing(GridSquare tank) {
-            switch (tank.Contents)
-            {
-                case GridSquare.ContentType.TankDown:
-                    return PlayerWorldState.Facing.Down;
-                case GridSquare.ContentType.TankLeft:
-                    return PlayerWorldState.Facing.Left;
-                case GridSquare.ContentType.TankRight:
-                    return PlayerWorldState.Facing.Right;
-                case GridSquare.ContentType.TankUp:
-                    return PlayerWorldState.Facing.Up;
-                default:
-                    // shouldn't happen
-                    return PlayerWorldState.Facing.Down;
-            }
-        }
         // Actions
 
         public ICommand moveUp()
         {
             return new Command(Command.Move.Up, true);
         }
+
+        // Helper methods
 
         public void updateMap()
         {
@@ -400,6 +304,106 @@ namespace GridWorld
 
             // tanks only matter when we can see them
             return new GridSquare(x, y, GridSquare.ContentType.Empty);
+        }
+
+        private GridSquare getClosestEnemy()
+        {
+            List<GridSquare> visible = worldState.MyVisibleSquares;
+            GridSquare enemySquare = null;
+            Tuple<int, int> enemy = null;
+            GridSquare hero = worldState.MyGridSquare;
+            foreach (GridSquare square in visible)
+            {
+                if (!isTank(square))
+                {
+                    continue;
+                }
+
+                if (square.X == hero.X && square.Y == hero.Y)
+                {
+                    continue;
+                }
+
+                // this is a tank which is not the hero
+                if (enemy == null)
+                {
+                    // first tank found
+                    enemy = new Tuple<int, int>(square.X, square.Y);
+                    enemySquare = square;
+                }
+                else
+                {
+                    // another tank exists, keep the closes one
+                    Tuple<int, int> enemy2 = new Tuple<int, int>(square.X, square.Y);
+                    Tuple<int, int> h = new Tuple<int, int>(hero.X, hero.Y);
+                    enemy = closest(h, enemy, enemy2);
+                    if (enemy.Equals(enemy2))
+                    {
+                        enemySquare = square;
+                    }
+                }
+            }
+            return enemySquare;
+        }
+
+        private Tuple<int, int> closest(Tuple<int, int> h, Tuple<int, int> p, Tuple<int, int> q)
+        {
+            // Use squared Euclidean distance, as it is good enough and quicker to compute
+            if (squaredDistance(h, p) >= squaredDistance(h, q))
+            {
+                return p;
+            }
+            else
+            {
+                return q;
+            }
+        }
+
+        private int squaredDistance(Tuple<int, int> p, Tuple<int, int> q)
+        {
+            int deltaX = q.Item1 - p.Item1;
+            int deltaY = q.Item2 - p.Item2;
+            return deltaX * deltaX + deltaY * deltaY;
+        }
+
+        private bool isTank(GridSquare s)
+        {
+            return (s.Contents == GridSquare.ContentType.TankDown)
+                || (s.Contents == GridSquare.ContentType.TankUp)
+                || (s.Contents == GridSquare.ContentType.TankLeft)
+                || (s.Contents == GridSquare.ContentType.TankRight);
+        }
+        private GridSquare[,] fromLocalMap()
+        {
+            GridSquare[,] gs = new GridSquare[localMap.GetLength(0), localMap.GetLength(1)];
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    gs[x, y] = convertFromCell(localMap[x, y], x, y);
+                }
+            }
+
+            return gs;
+        }
+
+        // assumes there is a tank there
+        private PlayerWorldState.Facing getFacing(GridSquare tank)
+        {
+            switch (tank.Contents)
+            {
+                case GridSquare.ContentType.TankDown:
+                    return PlayerWorldState.Facing.Down;
+                case GridSquare.ContentType.TankLeft:
+                    return PlayerWorldState.Facing.Left;
+                case GridSquare.ContentType.TankRight:
+                    return PlayerWorldState.Facing.Right;
+                case GridSquare.ContentType.TankUp:
+                    return PlayerWorldState.Facing.Up;
+                default:
+                    // shouldn't happen
+                    return PlayerWorldState.Facing.Down;
+            }
         }
 
         class SubsumptionDispatch
