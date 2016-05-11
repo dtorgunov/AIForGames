@@ -78,21 +78,7 @@ namespace GridWorld
 
         public bool singleEnemy()
         {
-            int totalEnemyCount = worldState.PlayerCount - 1;
-            int aliveEnemyCount = totalEnemyCount;
-            for (int x = 0; x < localMap.GetLength(0); x++)
-            {
-                for (int y = 0; y < localMap.GetLength(1); y++)
-                {
-                    if (localMap[x, y] == Cell.Destroyed)
-                    {
-                        // subtract the enemies we know are destroyed
-                        aliveEnemyCount--;
-                    }
-                }
-            }
-
-            return aliveEnemyCount == 1;
+            return enemyCount() == 1;
         }
 
         public bool seenByEnemy()
@@ -111,6 +97,18 @@ namespace GridWorld
             PlayerWorldState.Facing enemyFacing = getFacing(enemy);
 
             return worldState.CanSee(enemyFacing, enemy.X, enemy.Y, myX, myY, gs);
+        }
+
+        public bool enemiesExist()
+        {
+            return enemyCount() > 1;
+        }
+
+        public bool enemySighted()
+        {
+            GridSquare closestEnemy = getClosestEnemy();
+            // closest enemy refers to the closest VISIBLE enemy
+            return !(closestEnemy == null);
         }
 
         // Actions
@@ -404,6 +402,25 @@ namespace GridWorld
                     // shouldn't happen
                     return PlayerWorldState.Facing.Down;
             }
+        }
+
+        private int enemyCount()
+        {
+            int totalEnemyCount = worldState.PlayerCount - 1;
+            int aliveEnemyCount = totalEnemyCount;
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    if (localMap[x, y] == Cell.Destroyed)
+                    {
+                        // subtract the enemies we know are destroyed
+                        aliveEnemyCount--;
+                    }
+                }
+            }
+
+            return aliveEnemyCount;
         }
 
         class SubsumptionDispatch
