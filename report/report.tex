@@ -42,14 +42,20 @@ AI For Games Coursework Submission (Tanks)}
 \date{}
 
 \begin{document}
+
 \maketitle
+\begin{abstract}
+  This report details the design and implementation of an AI player for a game of Tanks, based on a subsumptive architecutre. We highlight the improvements to our pathfinding module based on what we have learned during our work on the previous coursework, as well as detail our own implementation of subsumptive dispatch. We mention some of the issues we had during development and provide suggestions for future work and improvement.
+\end{abstract}
 \tableofcontents
 \thispagestyle{empty}
 
 \newpage
 
 \section{Introduction}
-This report details the implementation of a subsumption-based AI, as developed by the group ``Team \(-i^2\)''.\footnote{Refine and add abstract}
+This report details the implementation of a subsumption-based AI, as developed by the group ``Team \(-i^2\)''. The implemnetation focuses on an adaptive approcah and uses A* for effiecent pathfinding and navigation. It is meant to be extendible and the implementation produced, while succesful\footnote{was it?} during testing, was envisoned more as a proof of concept, with suggestions on better levereging the approach proposed given in section~\ref{sec:futureWork}.
+
+Due to the fact that most of the codebase had to be implemented from scratch, as well as time constraints, the resulting AI might not be sufficiently optimised, and therefore unable to utilise CPU time provided in the most efficient manner. Suggestions for further optimisation are also given in section~\ref{sec:futureWork}.\footnote{Make sure that's true}
 
 \section{AI Design and Implementation} \label{sec:design}
 
