@@ -8,6 +8,7 @@
         int x;
         int y;
         int tile;
+        Cell cell;
         int hCost;
         int gCost;
         int fCost;
@@ -38,6 +39,23 @@
 
         }
 
+        public GridNode(int x, int y, Cell cell){
+
+            this.x = x;
+            this.y = y;
+            this.cell = cell;
+
+            if (cell == Cell.Empty)
+            {
+                walkable = true;
+            }
+            else
+            {
+                walkable = false;
+            }
+
+        }
+
         /// <summary>
         /// Returns a value representing if this GridNode is walkable.
         /// </summary>
@@ -45,6 +63,11 @@
         public bool GetWalkable()
         {
             return walkable;
+        }
+
+        public string ToString()
+        {
+            return ("X: " + x +"Y: " + y );
         }
 
         /// <summary>
@@ -109,6 +132,7 @@
         /// <returns>The F-cost of this GridNode.</returns>
         public int GetFCost()
         {
+            SetFCost();
             return fCost;
         }
 
@@ -161,6 +185,12 @@
             {
                 return this.y;
             }
+        }
+
+        public Tuple<int, int> ToTuple()
+        {
+
+            return new Tuple<int, int>(x, y);
         }
 
 
