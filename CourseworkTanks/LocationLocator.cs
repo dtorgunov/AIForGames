@@ -207,16 +207,16 @@ namespace GridWorld
         private Tuple<int, int> Dodge(int xAdd, int yAdd)
         {
             Random r = new Random();
-            if (localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock)
+            if (localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock && localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Destroyed && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Destroyed)
             {
                 if (r.Next(2) == 0)
                     return new Tuple<int, int>(hero.X + xAdd, hero.Y + yAdd);
                 else
                     return new Tuple<int, int>(hero.X - xAdd, hero.Y - yAdd);
             }
-            if (localMap[hero.X + xAdd, hero.Y + yAdd] == Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock)
+            if (localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Destroyed)
                 return new Tuple<int, int>(hero.X - xAdd, hero.Y - yAdd);
-            if (localMap[hero.X, hero.Y - yAdd] == Cell.Rock && localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock)
+            if (localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock && localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Destroyed)
                 return new Tuple<int, int>(hero.X + xAdd, hero.Y + yAdd);
 
             return RandomKnown(localMap.GetLength(0), localMap.GetLength(0));
