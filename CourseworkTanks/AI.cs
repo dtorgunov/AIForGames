@@ -39,9 +39,8 @@ namespace GridWorld
         public dtorguno()
             : base()
         {
-            this.Name = "Subsumptive AI";
+            this.Name = "A*ship";
             this.localMap = null;
-            this.dispatcher = chooseBehaviour();
         }
 
         /// <summary>
@@ -60,27 +59,51 @@ namespace GridWorld
                     localMap[x, y] = Cell.Unexplored;
                 }
             }
+
             this.pathFinder = new MightyPathFinder(localMap);
             this.locationLocator = new LocationLocator(localMap, this.ID);
+            this.dispatcher = chooseBehaviour();
         }
 
         /// <summary>
-        /// Randomy choose a behaviour profile.
+        /// Randomy choose a behaviour profile. Bias it towards the behaviour that should give us
+        /// more points overall.
         /// </summary>
         /// <returns>The subsumption dispatcher corresponding to the chosen profile.</returns>
         private SubsumptionDispatch chooseBehaviour()
         {
             Random r = new Random();
-            int choise = r.Next(2);
-            if (choise == 0)
+            int choise = r.Next(100);
+            int scoreForRock = worldState.ScorePerRockSquareSeen;
+            int scoreForEmpty = worldState.ScorePerEmptySquareSeen;
+            int scoreForTank = worldState.ScorePerOpposingTankDestroyed;
+            double averageExploration = ((double)(scoreForEmpty + scoreForRock)) / 2.0;
+
+            int area = worldState.GridHeightInSquares * worldState.GridWidthInSquares;
+            int numberOfEnemies = worldState.PlayerCount - 1;
+
+            // if the average score for exploring 3/4 of the area is bigger than the score
+            // for killing all enemies -- bias towards explorer
+            double areaScaleFactor = ((double)area) * 3.0 / 4.0;
+            SubsumptionDispatch biasTowards, biasAgainst;
+            if (areaScaleFactor * averageExploration > numberOfEnemies * scoreForTank)
             {
-                WriteTrace("Playing hunter");
-                return hunter();
+                biasTowards = explorer();
+                biasAgainst = hunter();
             }
             else
             {
-                WriteTrace("Playing explorer");
-                return explorer();
+                biasTowards = hunter();
+                biasAgainst = explorer();
+            }
+
+            if (choise < 61)
+            {
+                return biasTowards;
+            }
+            else
+            {
+                return biasAgainst;
             }
         }
 
@@ -339,7 +362,17 @@ namespace GridWorld
             }
 
             // no known enemy locations, move to a random reachable cell
-            return explorationMove(locationLocator.RandomReachable(worldState.MyGridSquare));
+            Tuple<int, int> potentialCell = locationLocator.RandomReachable(worldState.MyGridSquare);
+            List<GridNode> path2 = pathFinder.GetPathToTarget(potentialCell,
+                        worldState.MyGridSquare);
+            while (!(path2.Count > 1))
+            {
+                potentialCell = locationLocator.RandomReachable(worldState.MyGridSquare);
+                path2 = pathFinder.GetPathToTarget(potentialCell,
+                        worldState.MyGridSquare);
+            }
+
+            return explorationMove(potentialCell);
         }
 
         
