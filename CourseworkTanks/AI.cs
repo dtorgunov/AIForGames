@@ -362,7 +362,17 @@ namespace GridWorld
             }
 
             // no known enemy locations, move to a random reachable cell
-            return explorationMove(locationLocator.RandomReachable(worldState.MyGridSquare));
+            Tuple<int, int> potentialCell = locationLocator.RandomReachable(worldState.MyGridSquare);
+            List<GridNode> path2 = pathFinder.GetPathToTarget(potentialCell,
+                        worldState.MyGridSquare);
+            while (!(path2.Count > 1))
+            {
+                potentialCell = locationLocator.RandomReachable(worldState.MyGridSquare);
+                path2 = pathFinder.GetPathToTarget(potentialCell,
+                        worldState.MyGridSquare);
+            }
+
+            return explorationMove(potentialCell);
         }
 
         

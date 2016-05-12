@@ -223,7 +223,7 @@ namespace GridWorld
             if (localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock && localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Destroyed)
                 return new Tuple<int, int>(hero.X + xAdd, hero.Y + yAdd);
 
-            return RandomKnown(localMap.GetLength(0), localMap.GetLength(0));
+            return RandomKnown(localMap.GetLength(0), localMap.GetLength(1));
         }
 
         /// <summary>
@@ -305,7 +305,8 @@ namespace GridWorld
             {
                 for (int y = 0; y < localMap.GetLength(1); y++)
                 {
-                    if (localMap[x, y] == Cell.Empty || localMap[x, y] == Cell.Hero)
+                    if ((localMap[x, y] == Cell.Empty || localMap[x, y] == Cell.Hero) // to account for possibly not cleaning Hero right
+                        && (x != hero.X && y != hero.Y))
                     {
                         reachableCells.Add(new Tuple<int, int>(x, y));
                     }
