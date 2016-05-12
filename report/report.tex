@@ -21,7 +21,6 @@
       flexiblecolumns=false,
       basewidth={0.5em,0.45em}
     }
-
 \usetikzlibrary{shapes,arrows,positioning}
 
 \tikzstyle{situation} = [rectangle, draw, fill=white!20, 
@@ -43,6 +42,7 @@ Developing an AI agent for the game of Tanks based on the subsumptive architectu
 
 \begin{document}
 
+\newcommand{\includecode}[2][c]{\lstinputlisting[caption=#2, escapechar=, style=custom#1]{#2}<!---->}
 \maketitle
 \begin{abstract}
   This report details the design and implementation of an AI player for a game of Tanks, based on a subsumptive architecutre. We highlight the improvements to our pathfinding module based on what we have learned during our work on the previous coursework, as well as detail our own implementation of subsumptive dispatch. We mention some of the issues we had during development and provide suggestions for future work and improvement.
@@ -107,7 +107,7 @@ We consider two possible behaviour profiles for this AI: the Hunter and the Expl
 
 Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.
 
-The choice of profile depends on what will give us a higher potential score gain. However, since we did not have sufficient data regarding how either profile performs against other AI opponents (see section~\ref{sec:testing} for details), we instead choose to randomise the choise, making it possible for either approach to be chosen when the AI is first loaded in. But, in order to maximise our chanses of winning, we bias the randomisation based on score gains for a given terrian.
+The choise of behaviour profile largly depends on which appraoch would be more profitable, in terms of points, on a given map. However, since we did not have sufficient data regarding how either profile performs against other AI opponents (see section~\ref{sec:testing} for details), we instead choose to randomise the choise, making it possible for either approach to be chosen when the AI is first loaded in. But, in order to maximise our chanses of winning, we bias the randomisation based on score gains for a given terrian.
 
 In particular, as mentioned above, Hunter aims to gain points for killing enemy tanks before other players can do so. But we can only destroy 3 tanks in total, and the gain in points might not be worth the risk. On the other hand, Explorer attempts to avoid confrontation, which might allow the enemy to cut us off from certain portions of the map, diminishing our score.
 
@@ -230,7 +230,7 @@ Furthermore, as several actions in our behaviour profiles involve navigating to 
 
 \subsection{Actions} \label{sec:actions}
 
-The actions that are carried out by the AI are dictated by the Subsumption Dispatch Table, which calls the relevant method in the class \verb|LocationLocator| that, in turn, attempts to find the best location to travel to in the given situation. This is achieved by having several methods, each relevant to one of the potental calls from the Subsumption Dispatch Table, with one being called each turn .
+The actions that are carried out by the AI are dictated by the Subsumption Dispatch Table, which calls the relevant method in the class \verb|LocationLocator| that, in turn, attempts to find the best location to travel to in the given situation. This is achieved by having several methods, each relevant to one of the potental calls from the Subsumption Dispatch Table, with one being called each turn.
 
 \subsubsection{Retreating}
 
@@ -251,13 +251,19 @@ The key action from the Hunter profile (Figure~\ref{fig:hunter}) is to find and 
 
 To begin with, the method calculates if it is possible to kill the opponent this turn, proceeding to do so if it is possible. This is achieved by checking if the AI and the opponent share either an X or a Y coordinate. If they do, then the AI calculates whether the tank is currently facing the opponent, before either attacking, or rotating and then attacking the given opponent. If this is not the case, then the \verb|Command| is returned, which is part of a path for the AI to follow towards the opponent. As the tank can only move in four directions, and cannot shoot diagonally, this ensures that the tank will reach a point from which it can attack the given enemy.
 
-\section{Testing and Tuning}
+\section{Testing and Tuning} \label{sec:testing}
 
 In order to test pathfinding and exploration without the oppontent AI destroying us, we have implemented a simple ``Useless'' AI, following the logic described in the lecture notes, that simply stays stationary and avoids attacking. This allowed us to safely navigate around the map and discover the bugs in the exploration part of the code.
 
 In addition, problems arouse due to unexpected errors coming from Visual Studio. Firstly, we got errors trying to load the (standard) \verb|Tuple| class, so we have implemented our own, adhereing to the same naming conventions for elements\cite{cSharpTuple}, to make it interoperate with the code already written. In addition, similar errors appeared as the development progressed. Eventually, we have decided to try changing the .NET framework version used by the IDE to 3.5, and while that seemed to resolve the issue, it gave us cryptic warnings that we did not have time to investigate in detail and that might account for some of the bugs.
 
 Due to problems accessing the GridWorld server, all of our testing had to be carried out locally, utilising either the ``Useless'' AI or the stock AI provided. Originally, we were going to tune the performance of the agent by experimenting with different priorities and actions in the behaviour profiles, but as real world performance data was unavailable, it could not be done reliably.
+
+However, a small element of ``learning'' has been noticed during testing. Specifically, if the AI is not reloaded, but the game is simply ``rewound'' to the first turn, we still retain the map layout explored during the previous game.
+
+A few errors have revealed in testing, and subsequently fixed, but overall more refinement is needed before the AI is able to win consistently. In particular, perhaps instead of choosing random cells when exploring or seeking enemies, we need to apply some sort of heuristic that will lead to better overall score.
+
+The only issue we have found is, if multiple AIs are loaded in Explorer mode, they come to a stailmate, as they explore all they can, and then stay still until there is only a single enemy left, which never happens, leading to a tie.
 
 \section{Recommendations for Future Work} \label{sec:futureWork}
 
@@ -288,5 +294,30 @@ While developing this AI, we have levereged the skills and knowledge gained both
 
 \section{Evidence of Group Work}
 Throughout this project's development, Github has been used in order to synchronise our work and communicate issues. Below, we list the final log of git contributions, showing that all the group members have participated. Note that, on average, people with less commits had more code added per commit. The majority of the work on the report has been done as a group.
+
+Merge commits have been omitted from the log for brevity.
+
 \section{Source code}
+
+\subsection*{Tuple.cs}
+\begin{code}
+  
+\end{code}
+\subsection*{GridNode.cs}
+\begin{code}
+  
+\end{code}
+\subsection*{MightPathFinder.cs}
+\begin{code}
+  
+\end{code}
+\subsection*{LocationLocator.cs}
+\begin{code}
+  
+\end{code}
+\subsection*{AI.cs}
+\begin{code}
+
+\end{code}
+
 \end{document}
