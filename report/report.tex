@@ -29,15 +29,15 @@
 \tikzstyle{action} = [rectangle, draw, fill=white!20, 
     text width=8em, text centered, rounded corners=2em, minimum height=4em]
 \tikzstyle{subsumptor} = [circle, draw, fill=white!20,
-    text width=3em, text centered]
+    text width=2em, text centered]
 \tikzstyle{line_n} = [draw, -latex']
 \tikzstyle{headless_n} = [draw]
 \tikzstyle{anchor_n} = [inner sep=0pt, fill=none, draw=none]
 
-\title{Team \(-i^2\)\\
-AI For Games Coursework Submission (Tanks)}
+\title{Artificial Intelligence for Games\\
+Developing an AI agent for the game of Tanks based on the subsumptive architecture}
 
-\author{Connor Aspinall \and George Bell \and Denis Torgunov}
+\author{Connor Aspinall (13021267) \and George Bell (13025221) \and Denis Torgunov (13011546)}
 
 \date{}
 
@@ -55,7 +55,7 @@ AI For Games Coursework Submission (Tanks)}
 \section{Introduction}
 This report details the implementation of a subsumption-based AI, as developed by the group ``Team \(-i^2\)''. The implemnetation focuses on an adaptive approcah and uses A* for effiecent pathfinding and navigation. It is meant to be extendible and the implementation produced, while succesful\footnote{was it?} during testing, was envisoned more as a proof of concept, with suggestions on better levereging the approach proposed given in section~\ref{sec:futureWork}.
 
-Due to the fact that most of the codebase had to be implemented from scratch, as well as time constraints, the resulting AI might not be sufficiently optimised, and therefore unable to utilise CPU time provided in the most efficient manner. Suggestions for further optimisation are also given in section~\ref{sec:futureWork}.\footnote{Make sure that's true. Added - George}
+Due to the fact that most of the codebase had to be implemented from scratch, as well as time constraints, the resulting AI might not be sufficiently optimised, and therefore unable to utilise CPU time provided in the most efficient manner. Suggestions for further optimisation are also given in section~\ref{sec:futureWork}.
 
 \section{AI Design and Implementation} \label{sec:design}
 
@@ -75,7 +75,7 @@ public delegate ICommand Action();
 
 A \verb|Situation| is a predicate that represents a situation in the game, corresponding to sensory input in a traditional subsumption architecture. An \verb|Action| represents a method that returns the next command to execute, corresponding to operating an acutator. It is assumed to take no arguments, relying purely on the internal state of the main class for any information about map composition, current player position, etc.
 
-Having defined those delegates, we can create a dispatch table in a linked list of tuples:
+Having defined those delegates, we can implement a dispatch table as a linked list of tuples:
 
 \begin{code}
 private List<Tuple<Situation, Action>> dispatchTable;
@@ -99,15 +99,17 @@ public ICommand act()
 }
 \end{code}
 
-As soon as the \verb|Action| whose \verb|Situation| predicate returns true is found, we simply execute that action, returning the corresponding command to be executed on this turn.
+As soon as the \verb|Action| with a matching \verb|Situation| is found, we simply execute that action, returning the corresponding command to be executed on this turn.
 
 \subsection{Behaviour Profiles} \label{sec:behaviourProfiles}
 
-We consider two possible behaviour profiles for is AI: the Hunter and the Explorer. The goal of the game it to maximise the score, and the behaviour process aims to do so in the most efficient way. If exploration is more valuable, point-wise, than killing opponents, we can utilise the Explorer profile, which focuses primarily on discovering the map and avoiding confrontation. On the other hand, if the amount of points received for killing an enemy is higher than the amount of points gained (on average) through exploration, we utilise the Hunter profile, which will actively seek to destroy enemy tanks.
+We consider two possible behaviour profiles for this AI: the Hunter and the Explorer. The goal of the game is to maximise the score, and the behaviour process aims to do so in the most efficient way. If exploration is more valuable, point-wise, than killing opponents, we can utilise the Explorer profile, which focuses primarily on discovering the map and avoiding confrontation. On the other hand, if the amount of points received for killing an enemy is higher than the amount of points gained (on average) through exploration, we utilise the Hunter profile, which will actively seek to destroy enemy tanks.
 
-Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.\footnote{refine the diagrams}
+Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.
 
 At present, we adopt the Explorer profile if the average score gain for discovering a rock or empty cell is larger than the score gain for destroying an enemy. This could be further improved, however appears to be a good ``ball-park'' metric.
+
+Since the default action implies that there are no enemies left and all of the map has been explored, we simply stay still, as there are no further points to be gained.
 
 \afterpage{
 \clearpage
@@ -116,28 +118,35 @@ At present, we adopt the Explorer profile if the average score gain for discover
 \begin{figure}[h]
   \centering
   \begin{tikzpicture}[node distance=2cm, auto]
-    \node[situation] (enemy) {Can be seen by enemy};
+    \node[situation] (finalBoss) {The only remaining enemy can be seen};
+    \node[situation,below=0.5em of finalBoss] (enemy) {Can be seen by enemy};
     \node[situation,below=0.5em of enemy] (unexploredNode) {Unexplored node exists};
     \node[situation,below=0.5em of unexploredNode] (singleEnemy) {Enemy count \(=\) 1};
     \node[situation,below=0.5em of singleEnemy] (default) {Default action};
 
+    \node[action,right=3em of finalBoss] (fight) {Engage};
     \node[action,right=3em of enemy] (runAway) {Run away};
     \node[action,right=3em of unexploredNode] (headTo) {Head to node};
-    \node[action,right=3em of singleEnemy] (engage) {Engage enemy};
+    \node[action,right=3em of singleEnemy] (engage) {Look for trouble};
+    \node[action,right=3em of default] (stay) {Stay still};
 
     \node[right=5.5em of engage] (anchorPoint) {};
     
-    \node[subsumptor, below=2em of anchorPoint] (s1) {\huge S}; 
+    \node[subsumptor, below=2.5em of anchorPoint] (s1) {\huge S}; 
     \node[subsumptor, right=2em of s1] (s2) {\huge S}; 
     \node[subsumptor, right=2em of s2] (s3) {\huge S}; 
+    \node[subsumptor, right=2em of s3] (s4) {\huge S}; 
     
-    \node[situation, right=2em of s3] (command) {Command};
+    \node[situation, right=2em of s4] (command) {Command};
     
-    \path[draw,->] (default) -- (s1);
+    \path[draw,->] (default) -- (stay);
+    \path[draw,->] (stay) -- (s1);
     \path[draw,->] (s1) -- (s2);
     \path[draw,->] (s2) -- (s3);
-    \path[draw,->] (s3) -- (command);
+    \path[draw,->] (s3) -- (s4);
+    \path[draw,->] (s4) -- (command);
     
+    \path[draw,->] (finalBoss) -- (fight);
     \path[draw,->] (enemy) -- (runAway);
     \path[draw,->] (unexploredNode) -- (headTo);
     \path[draw,->] (singleEnemy) -- (engage);
@@ -145,6 +154,7 @@ At present, we adopt the Explorer profile if the average score gain for discover
     \path[draw,->] (engage) -| (s1);
     \path[draw,->] (headTo) -| (s2);
     \path[draw,->] (runAway) -| (s3);
+    \path[draw,->] (fight) -| (s4);
   \end{tikzpicture}
   \caption{The Explorer profile}
   \label{fig:explorer}
@@ -160,16 +170,18 @@ At present, we adopt the Explorer profile if the average score gain for discover
     \node[action,right=3em of enemy] (runAway) {Engage};
     \node[action,right=3em of unexploredNode] (headTo) {Seek enemy};
     \node[action,right=3em of singleEnemy] (engage) {Head to node};
+    \node[action,right=3em of default] (stay) {Stay still};
 
     \node[right=5.5em of engage] (anchorPoint) {};
     
-    \node[subsumptor, below=2em of anchorPoint] (s1) {\huge S}; 
+    \node[subsumptor, below=2.5em of anchorPoint] (s1) {\huge S}; 
     \node[subsumptor, right=2em of s1] (s2) {\huge S}; 
     \node[subsumptor, right=2em of s2] (s3) {\huge S}; 
     
     \node[situation, right=2em of s3] (command) {Command};
     
-    \path[draw,->] (default) -- (s1);
+    \path[draw,->] (default) -- (stay);
+    \path[draw,->] (stay) -- (s1);
     \path[draw,->] (s1) -- (s2);
     \path[draw,->] (s2) -- (s3);
     \path[draw,->] (s3) -- (command);
@@ -191,24 +203,26 @@ At present, we adopt the Explorer profile if the average score gain for discover
 
 \subsection{Mapping and Pathfinding}
 
-In order to make it easier to navigate and seek out enemies, we keep track not only of the visible area, but also of the overall map explored so far.  To that end, we have defined a \verb|Cell| enum. We keep and update an array of \verb|Cell|s, filling it with the ``visible'' information on each turn. 
+In order to make it easier to navigate and seek out enemies, we keep track not only of the visible area, but also of the overall map explored so far.  To that end, we have defined a \verb|Cell| enum. We keep and update an array of \verb|Cell|s, filling it with the ``visible'' information on each turn. \footnote{What the word?}
 
 We also keep track of the last place we saw enemy tanks, to make it easier to avoid or chase them later. This means that we also have to ``prune'' the map every so often, making sure there is at most one instance of each enemy (the one we saw most recently). For more details, please see section~\ref{sec:aiCode}.
 
-The pathfinding algorithm we use is a refined and improved version of the A* implementation used in our previous coursework submission\cite{theGloriousWe}. We have cleaned up the \verb|GridNode| class, making it more streamlined, smaller and easier to use by removing redundant accessor functions. Since the class is only ever used within the project and no pre-processing of parameters is necessary, and no guarded conditions exist that could be expressed via setters, we simply made the relevant fields public. The only exception is \verb|GridNode.fCost|, which has been replacted with a getter that simply returns the relevant value based on the other parameters. This reduces the risk of \verb|GridNode.fCost| not being update properly by mistake.
+The pathfinding algorithm we use is a refined and improved version of the A* implementation used in our previous coursework submission\cite{theGloriousWe}. We have cleaned up the \verb|GridNode| class, making it more streamlined, smaller and easier to use by removing redundant accessor functions. Since the class is only ever used within the project and no pre-processing of parameters is necessary, and no guarded conditions exist that could be enforced by, we simply made the relevant fields public. The only exception is \verb|GridNode.fCost|, which has been replacted with a getter that simply returns the relevant value, computed based on the other parameters. This reduces the risk of \verb|GridNode.fCost| not being updated properly by mistake.
 
 In addition, we also have completely restructured the main pathfinding logic, in order to remove errors previously present. We have levereged what we have learned while implementing the first iteration\cite{theGloriousWe} and improved on the main shortcomings.
 
 The most significant changes are as follows:
 
 \begin{itemize}
-\item Fixed an issue which caused the \verb|GridNode.fCost| be set inconsistantly while constructing the list of neighbours.
+\item Fixed an issue which caused the \verb|GridNode.fCost| to be set inconsistantly while constructing the list of neighbours.
 \item Fixed an issue where the path returned is not gaurenteed to be the shortest path as some \verb|GridNode|s where skipped unnecessarily.
-\item Optimised the implementation by sorting the list to act as a priority queue, potentially reducing CPU time (depending on the native .NET sort implementation)
-\item Made code more readable by using a stack when listing neighbours and looping through its contents instead of considering each neighbour explicitly when testing whether a coordinate is withing the bounds of the board array, as well as reducing complexity, as previously a nested loop was used
+\item Optimised the implementation by sorting the list to act as a priority queue, potentially reducing CPU time (depending on the native .NET sort implementation).
+\item To improve code readability, we use a stack when listing neighbours. We loop through the stack's contents instead of considering each neighbour explicitly when testing whether a coordinate is within the bounds of the board array. Previously, a nested loop was used, but the corrent approach, in addition to making the code easier to understand, also reduces complexity.
 \end{itemize}
 
 For the full listing of the pathfinding code please see section~\ref{sec:pathfindingCode}.
+
+Furthermore, as several actions in our behaviour profiles involve navigating to unexplored parts of the map, we needed a reliable way to determine which unexplored cells we could navigate to. In order to achive that, we have implemented a function \verb|LocationLocator.UnexploredNode()|, which returns a node at the edge of the currently explored region and not behind a potential wall, if such a node exists. The full code listing is available in section~\ref{sec:locationLocator}, and is based on \cite{denport}.
 
 \subsection{Actions} \label{sec:actions}
 
@@ -216,42 +230,48 @@ The actions that are carried out by the AI are dictated by the Subsumption Dispa
 
 \subsubsection{Retreating}
 
-One of these key actions that can be carried out under the Explorer profile\footnote{Figure~\ref{fig:explorer}} is the run away action. This allows the AI to retreat when threated by an opponent, with the action being found in the \verb|Retreat| method of the \verb|LocationLocator| class. The full source code is listed in section~\ref{sec:coward}. This method begins by generating a \verb|List| of \verb|GridNode|s found around the player that contain an obstacle that can be hidden behind. This list is initially generated from a 3-by-3 area which is centred on the player, however this are will be expanded if no suitable hiding locations are found. Due to the increasing complexity of this algorithm upon expansion\cite{GeorgeComplex}, it is capped at an area of 5-by-5, or an additional \verb|GridNode| in each direction. If, after analysing an area of that size and finding no suitable cover, it will default to dodging in a random direction until it moves closer to something it can take cover behind.
+One of these key actions that can be carried out under the Explorer profile (as can be seen in Figure~\ref{fig:explorer}) is the run away action. This allows the AI to retreat when threated by an opponent, with the corresponding action being found in the method \verb|LocationLocator.Retreat()|. The full source code is listed in section~\ref{sec:coward}. This method begins by generating a \verb|List| of \verb|GridNode|s found around the player that contain an obstacle that can be hidden behind. This list is initially generated from a 3-by-3 area which is centred on the player, however this will be expanded if no suitable hiding locations are found. Due to the increasing complexity of this algorithm upon expansion\cite{GeorgeComplex}, it is capped at an area of 5-by-5, or an additional \verb|GridNode| in each direction. If, after analysing an area of that size we find no suitable cover, it will default to dodging in a random direction until it moves closer to something it can take cover behind.
 
-Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location. This is done by comparing the value of the \verb|Cell| to that of \verb|Cell.Empty|. Initally, this is done by looking at any obstacles in the four cardinal directions within GridWorld (Up, Down, Left and Right) and check the side opposite the player. If the these locations are not valid, or if no obstacles exist in these positions, the AI checks the corner \verb|Cell|s. These can potentionally have two seperate locations that the tank can hidden, so both the furtherest X and Y locations (Relative to the player) must be checked. Again, if there is a valid location to move to and hide at, it will do so, but if there is not then the AI defaults back to the \verb|RandomDodge| method.
+Upon finding a valid piece of cover, the AI will check behind it to see if it is a valid location. This is done by comparing the value of the \verb|Cell| to that of \verb|Cell.Empty|. Initally, this is done by looking at any obstacles in the four cardinal directions within GridWorld (Up, Down, Left and Right) and check the side opposite the player. If the these locations are not valid, or if no obstacles exist in these positions, the AI checks the corner \verb|Cell|s. These can potentionally have two seperate locations where the tank can hide, so both the furtherest X and Y locations (relative to the player) must be checked. Again, if there is a valid location to move to and hide at, it will do so, but if there is not then the AI defaults back to the \verb|LocationLocator.RandomDodge()| method.
 
-\verb|RandomDodge|, which is used when no hidding places are found close to the player, works to determine to where the player should move. The randomness is include so that, if there are multiple moves possible at a given time, it will choose one that is cannot be predicted. This behaviour is often seen in video games\cite{GeorgeRandom}, as it can lead to unexpected events occuring for the player, although it is also helpful in this scenario as it enables the AI to be slightly unprodictable, potentally dealing with opponents that implemtent machine learning.
+\verb|LocationLocator.RandomDodge()|, which is used when no hidding places are found close to the player, works to determine where the player should move. The randomness is included so that, if there are multiple moves possible at a given time, it will choose one that cannot be predicted. This behaviour is often seen in video games\cite{GeorgeRandom}, as it can lead to unexpected events occuring for the player, although it is also helpful in this scenario as it enables the AI to be slightly unpredictable, potentally dealing with opponents that implemtent machine learning.
 
 \subsubsection{Attacking}
 
-The key action from the Hunter profile\footnote{Figure~\ref{fig:hunter}} is to find and kill the opponent. This action is carried out in the \verb|Attack| method, which accepts the following arguements:
+The key action from the Hunter profile (Figure~\ref{fig:hunter}) is to find and kill a visible opponent. This action is carried out in the \verb|LocationLocator.Attack()| method, which accepts the following arguements:
 \begin{itemize}
 \item The \verb|GridSquare| that contains the opponent to attack.
 \item A \verb|PlayerWorldState.Facing| that represents the direction the AI is facing.
-\item The \verb|MightyPathFinder| used by the AI to path to locations.
+\item The \verb|MightyPathFinder| is used by the AI to path to locations.
 \end{itemize}
 
-To begin with, the method calculates if it is possible to kill the oppoent this turn, proceeding to doing so if it is possible. This is achieved by checking if the AI and the opponent share either an X or a Y coordinate. If they do then the AI calculates whether the tank is currently facing the opponent, before either attacking or rotating and then attacking the given opponent. If this is not the case then the pathfinder is used, which generates a path for the AI to follow towards the opponent. As the tank can only move in four directions, and cannot shoot diagonally, this ensures that the tank will reach a point from which it can attack the given enemy.
+To begin with, the method calculates if it is possible to kill the opponent this turn, proceeding to do so if it is possible. This is achieved by checking if the AI and the opponent share either an X or a Y coordinate. If they do, then the AI calculates whether the tank is currently facing the opponent, before either attacking, or rotating and then attacking the given opponent. If this is not the case, then the pathfinder is used, which generates a path for the AI to follow towards the opponent. As the tank can only move in four directions, and cannot shoot diagonally, this ensures that the tank will reach a point from which it can attack the given enemy.
 
 \section{Testing and Tuning}
 
-In order to test pathfinding and exploration without the oppontent AI destroying us, we have implemented a simple ``Useless'' AI, following the logic described in the lecture notes\footnote{Do we reeeeeeeeeeeally need a citation?	George says yes.}, that simply stays stationary and avoids attacking. This allowed us to safely navigate around the map and discover the bugs in the exploration part of the code\footnote{were they fixed?}.
+In order to test pathfinding and exploration without the oppontent AI destroying us, we have implemented a simple ``Useless'' AI, following the logic described in the lecture notes, that simply stays stationary and avoids attacking. This allowed us to safely navigate around the map and discover the bugs in the exploration part of the code.
 
-In addition, problems arouse due to unexpected errors coming from Visual Studio. Firstly, we got errors trying to load the (standard) \verb|Tuple| class, so we have implemented our own, adhereing to the same naming conventions for elements, to make it interoperate with the code already written. Furthermore, more such errors appeared as more code was added. Eventually, we have decided to try changing the .NET framework version, and while that seemed to resolve the issue, it gave us cryptic warning that we did not have time to investigate in details and that might account for some of the bugs.
+In addition, problems arouse due to unexpected errors coming from Visual Studio. Firstly, we got errors trying to load the (standard) \verb|Tuple| class, so we have implemented our own, adhereing to the same naming conventions for elements\cite{cSharpTuple}, to make it interoperate with the code already written. In addition, similar errors appeared as the development progressed. Eventually, we have decided to try changing the .NET framework version used by the IDE to 3.5, and while that seemed to resolve the issue, it gave us cryptic warnings that we did not have time to investigate in detail and that might account for some of the bugs.
+
+Due to problems accessing the GridWorld server, all of our testing had to be carried out locally, utilising either the ``Useless'' AI or the stock AI provided. Originally, we were going to tune the performance of the agent by experimenting with different priorities and actions in the behaviour profiles, but as real world performance data was unavailable, it could not be done reliably.
 
 \section{Recommendations for Future Work} \label{sec:futureWork}
 
-As mentioned earlier in section~\ref{sec:design}, it is possible to make this AI better by, instead of providing predefined behaviour profiles, allowing for a machine learning aspect by allowing the AI to learn, throughout the game, to associate specific \verb|Situation|s with the best \verb|Action|s, as well as adjusting the priority of each binding accordingly. Genetic programming might be a good fit for such a task. However, because it is impossible to save the information on the GridWorld servers themsevles between games, it means that the AI has to learn locally, which severely limits the applicability of this approach within the given setup.
+As mentioned earlier in section~\ref{sec:design}, it is possible to make this AI better by, instead of providing predefined behaviour profiles, introducing a machine learning aspect by allowing the AI to learn, throughout the game, to associate specific \verb|Situation|s with the best \verb|Action|s, as well as adjusting the priority of each binding accordingly. Genetic programming might be a good fit for such a task. However, because it is impossible to save the information on the GridWorld servers themsevles between games, it means that the AI has to learn locally, which severely limits the applicability of this approach within the given setup.
 
-The actions and predicates themselves could be further refined and optimised. As detailed in section~\ref{sec:actions}, the complexity of some actions may be increased, allowing the AI to make more informed descions. With additonal refinement, this could be tested to find the right balance between runtime and complexity. \footnote{Needs rewording.}  For the attacking the AI carries out, the main addition to make would be to calcutate whether the player can attack the opponent before they themselves can be attacked, enabling a form of 'fight or flight' mechanisam to be implemented.
+The actions and predicates themselves could be further refined and optimised. As detailed in section~\ref{sec:actions}, the complexity of some actions may be increased, allowing the AI to make more informed descions. With additonal refinement and testing, we could find the right balance between runtime and complexity.  For  attacking the AI carries out, the main addition to make to the predicates would be to calcutate whether the player can attack the opponent before they themselves can be attacked, enabling a form of 'fight or flight' mechanism to be implemented.
 
-Our approach to mapping and extracting infromation from the local map kept is, most likely, the least optimised part of the implementation. In particular, we have to loop through the whole array multiple times on each game loop iteration. Combining the tests performed into a single loop and making predicates simple accessors to the boolean fields holding the information gathered this way should make the code a lot more refined.
+Our approach to mapping and extracting infromation from the local map kept is, most likely, the least optimised part of the implementation. In particular, we have to loop through the whole array multiple times on each game loop iteration. Combining the tests performed into a single loop and making predicates simple accessors to the boolean fields holding the information gathered this way should make the code a lot less redundant.
 
-Finally, the pathfinding algorithm, as presented in the code, computes the path anew on each loop iteration. If the target cell has not changed, and there is no change in \verb|Situation|, it should be possible to cache the path initially computed, and simply continue moving as needed, greatly reducing the work done on each game loop iteration\footnote{Connor, please make sure this is right}.
+Finally, the pathfinding algorithm, as presented in the code, computes the path anew on each loop iteration. If the target cell has not changed, and there is no change in \verb|Situation|, it should be possible to cache the path initially computed, and simply continue moving as needed, greatly reducing the work done on each game loop iteration.
 
 \subsection{GridWorld Recommendations}
 As mentioned above, the main element that we found missing in both this and the previous coursework submission for this module is the ability to retain information between runs on the GridWorld server. If each user was allocated a small amount of storage on the server, or a way to redirect some form of data to a text or binary file that could then be retrieved, it would be possible to view the server as a dynamic learning environment, broadening the applicability of machine learning approaches.
+
+More clarity in representing the game situation and knowledge would make debugging easier. For example, some form of visulisation of a tank firing, as well as a way to simulate the agent's field of view within GridWorld.
+
 \section{Conclusions}
+While developing this AI, we have levereged the skills and knowledge gained both as part of this module, as well as other related subjects. It has provided us with an interesting challenge, and the final intelligent agent produced has a lot of potential. While the submitted version might not be sufficiently tested and optimised, we believe that it could form a strong foundation for an adaptive, intelligent player with emergent intelligent behaviour.
 
 \newpage
 % \clearpage
@@ -263,6 +283,6 @@ As mentioned above, the main element that we found missing in both this and the 
 \appendix
 
 \section{Evidence of Group Work}
-Throughout this project's development, Github has been used in order to synchronise our work and communicate issues. Below, we list the final log of git contributions, showing that all the group members have contributed. Note that, on average, people with less commits had more code added per commit.\footnote{Add git logs when done}
+Throughout this project's development, Github has been used in order to synchronise our work and communicate issues. Below, we list the final log of git contributions, showing that all the group members have participated. Note that, on average, people with less commits had more code added per commit. The majority of the work on the report has been done as a group.
 \section{Source code}
 \end{document}
