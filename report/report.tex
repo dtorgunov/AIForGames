@@ -107,7 +107,11 @@ We consider two possible behaviour profiles for this AI: the Hunter and the Expl
 
 Figure~\ref{fig:explorer} outlines the Explorer behaviour profile, and figure~\ref{fig:hunter} outlines Hunter. The Explorer aims to explore as much of the map as possible, while allowing the enemies to fight amongst themselves, only going on the offensive when there is a single enemy left. On the other hand, the Hunter actively seeks to gain points by destroying enemy tanks, and only then explores the remaining parts of the map.
 
-At present, we adopt the Explorer profile if the average score gain for discovering a rock or empty cell is larger than the score gain for destroying an enemy. This could be further improved, however appears to be a good ``ball-park'' metric.
+The choice of profile depends on what will give us a higher potential score gain. However, since we did not have sufficient data regarding how either profile performs against other AI opponents (see section~\ref{sec:testing} for details), we instead choose to randomise the choise, making it possible for either approach to be chosen when the AI is first loaded in. But, in order to maximise our chanses of winning, we bias the randomisation based on score gains for a given terrian.
+
+In particular, as mentioned above, Hunter aims to gain points for killing enemy tanks before other players can do so. But we can only destroy 3 tanks in total, and the gain in points might not be worth the risk. On the other hand, Explorer attempts to avoid confrontation, which might allow the enemy to cut us off from certain portions of the map, diminishing our score.
+
+In the end, we chose to use the following metric: if the average gain for exploring 3/4 of the map is higher than the points gained for killing all 3 tanks, we bias the random profile chooser towards Explorer. Otherwise, the bias is towards Hunter. The ``biased'' profile has a 60\% chance of being picked.
 
 Since the default action implies that there are no enemies left and all of the map has been explored, we simply stay still, as there are no further points to be gained.
 
