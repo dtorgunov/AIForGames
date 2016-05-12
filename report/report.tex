@@ -293,7 +293,7 @@ While developing this AI, we have leveraged the skills and knowledge gained both
 
 \newpage
 \appendix
-
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
 \section{Evidence of Group Work}
 Throughout this project's development, Github has been used in order to synchronise our work and communicate issues. Below, we list the final log of git contributions, showing that all the group members have participated. Note that, on average, people with less commits had more code added per commit. The majority of the work on the report has been done as a group.
 
@@ -382,7 +382,7 @@ defbd1f Denis Torgunov       Create a copy of the Tuple class
 \section{Source code}
 Please note that a curved red arrow indicates a linebreak not present in the original code, inserted for readibility.
 
-\subsection*{Tuple.cs}
+\subsection{Tuple.cs}
 \begin{code}
 using System;
 using System.Collections.Generic;
@@ -424,7 +424,7 @@ namespace GridWorld
     }
 }
 \end{code}
-\subsection*{GridNode.cs}
+\subsection{GridNode.cs}
 \begin{code}
 namespace GridWorld
 {
@@ -481,7 +481,7 @@ namespace GridWorld
 }
 
 \end{code}
-\subsection*{MightPathFinder.cs}
+\subsection{MightyPathFinder.cs} \label{sec:pathfindingCode}
 \begin{code}
 using System;
 using System.Collections.Generic;
@@ -713,7 +713,7 @@ namespace GridWorld
     }
 }
 \end{code}
-\subsection*{LocationLocator.cs}
+\subsection{LocationLocator.cs} \label{sec:locationLocator} \label{sec:coward}
 \begin{code}
 using System;
 using System.Collections.Generic;
@@ -1275,7 +1275,9 @@ namespace GridWorld
     }
 }
 \end{code}
-\subsection*{AI.cs}
+\subsection{AI.cs} \label{sec:subsumptionCode} \label{sec:aiCode}
+Note that the \verb|SubsumptionDispatch| is an inner class of the main AI class.
+
 \begin{code}
 using System;
 using System.Collections.Generic;
@@ -2186,8 +2188,13 @@ namespace GridWorld
             public delegate ICommand Action();
 
             // the FIRST action in the table has HIGHEST priority
+            
+            /// <summary>
+            /// A dispatch table mapping Situations to Actions
+            /// </summary>
             private List<Tuple<Situation, Action>> dispatchTable;
 
+            
             public SubsumptionDispatch()
             {
                 this.dispatchTable = new List<Tuple<Situation, Action>>();
@@ -2198,17 +2205,28 @@ namespace GridWorld
                 this.dispatchTable = dispatchTable;
             }
 
-            // adds as the LOWEST PRIORITY action
+            /// <summary>
+            /// Add a new entry to the dispatch table, with lowest priority
+            /// </summary>
+            /// <param name=''entry''>An entry to add</param>
             public void add(Tuple<Situation, Action> entry)
             {
                 dispatchTable.Add(entry);
             }
 
+            /// <summary>
+            /// A way to represent a default action Situation.
+            /// </summary>
+            /// <returns>Always true</returns>
             public static bool defaultAction()
             {
                 return true;
             }
 
+            /// <summary>
+            /// Pick the appropriate action from the dispatch table and return its command
+            /// </summary>
+            /// <returns>The command to execute, given the current situation</returns>
             public ICommand act()
             {
                 foreach (Tuple<Situation, Action> behaviour in dispatchTable)
