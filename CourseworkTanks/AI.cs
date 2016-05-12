@@ -33,7 +33,7 @@ namespace GridWorld
                 (singleEnemy, moveUp));*/
 
             dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (SubsumptionDispatch.defaultAction, moveUp));
+                (SubsumptionDispatch.defaultAction, stay));
         }
 
         private void initMap() {
@@ -123,16 +123,9 @@ namespace GridWorld
 
         // Actions
 
-        public ICommand moveUp()
+        public ICommand stay()
         {
-            return new Command(Command.Move.Up, true);
-        }
-
-        public ICommand moveToAPlace()
-        {
-            WriteTrace("Hey, look, I'm going to a place!");
-            Tuple<int, int> aPlace = new Tuple<int, int>(0, 1);
-            return explorationMove(aPlace);
+            return new Command(Command.Move.Stay, false);
         }
 
         public ICommand runAway()
@@ -155,38 +148,41 @@ namespace GridWorld
             return explorationMove(dest);
         }
 
-        public ICommand lookForTrouble()
+        public ICommand seekEnemy()
         {
-            List<Tuple<int,int>> Enemies = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> Enemies = new List<Tuple<int, int>>();
 
             for (int x = 0; x < localMap.GetLength(0); x++)
             {
                 for (int y = 0; y < localMap.GetLength(1); y++)
                 {
-                    // if the cell contaions is an enemy tank placve in enemy list
-                    if (localMap[x, y] == Cell.Enemy1 || localMap[x, y] == Cell.Enemy2 || localMap[x, y] == Cell.Enemy3)
+
+                    if (Enemies.Count == enemyCount())
                     {
-                        Enemies.Add(new Tuple<int, int>(x,y));
+                        break;
                     }
 
+                    // if the cell contaions is an enemy tank place in enemy list
+                    if (localMap[x, y] == Cell.Enemy1 || localMap[x, y] == Cell.Enemy2 || localMap[x, y] == Cell.Enemy3)
+                    {
+                        Enemies.Add(new Tuple<int, int>(x, y));
+                    }
                 }
+            }
                 int cost = int.MaxValue;
-                Tuple<int, int> ApproxClosest;
+                Tuple<int, int> ApproxClosest = null;
                 Tuple<int, int> HeroTank = new Tuple<int, int>(worldState.MyGridSquare.X, worldState.MyGridSquare.Y);
 
                 foreach (var tank in Enemies)
                 {
-                    if (squaredDistance(tank,HeroTank) < cost)
+                    if (squaredDistance(tank, HeroTank) < cost)
                     {
                         ApproxClosest = tank;
+                        cost = squaredDistance(tank, HeroTank);
                     }
                 }
 
-                //pathFinder.GetPathToTarget(HeroTank);
-            }
-
-
-            return null;
+                return explorationMove(ApproxClosest);
         }
 
         
