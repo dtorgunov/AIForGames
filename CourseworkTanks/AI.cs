@@ -21,19 +21,7 @@ namespace GridWorld
         {
             this.Name = "Subsumptive AI";
             this.localMap = null;
-            this.dispatcher = new SubsumptionDispatch();
-
-            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (unexploredExists, goToUnexplored));
-
-            /*dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (seenByEnemy, moveUp));
-            
-            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (singleEnemy, moveUp));*/
-
-            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
-                (SubsumptionDispatch.defaultAction, stay));
+            this.dispatcher = explorer();
         }
 
         private void initMap() {
@@ -66,6 +54,41 @@ namespace GridWorld
             updateMap();
 
             return dispatcher.act();
+        }
+
+        // Behavious Profiles
+        private SubsumptionDispatch explorer()
+        {
+            SubsumptionDispatch dispatcher = new SubsumptionDispatch();
+
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (lastEnemySighted, engageEnemy));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (seenByEnemy, runAway));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (unexploredExists, goToUnexplored));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (singleEnemy, seekEnemy));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (SubsumptionDispatch.defaultAction, stay));
+            
+            return dispatcher;
+        }
+
+        private SubsumptionDispatch hunter()
+        {
+            SubsumptionDispatch dispatcher = new SubsumptionDispatch();
+
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (enemySighted, engageEnemy));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (enemiesExist, seekEnemy));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (unexploredExists, goToUnexplored));
+            dispatcher.add(new Tuple<SubsumptionDispatch.Situation, SubsumptionDispatch.Action>
+                (SubsumptionDispatch.defaultAction, stay));
+
+            return dispatcher;
         }
 
         // Predicates (Situations)
