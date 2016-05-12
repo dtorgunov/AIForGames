@@ -21,7 +21,7 @@ namespace GridWorld
         {
             this.Name = "Subsumptive AI";
             this.localMap = null;
-            this.dispatcher = explorer();
+            this.dispatcher = hunter();
         }
 
         private void initMap() {
@@ -39,7 +39,7 @@ namespace GridWorld
             }
             this.pathFinder = new MightyPathFinder(localMap);
             // what does the ID stand for?
-            this.locationLocator = new LocationLocator(localMap, worldState.MyGridSquare, this.ID);
+            this.locationLocator = new LocationLocator(localMap, this.ID);
         }
 
         public override ICommand GetTurnCommands(IPlayerWorldState igrid)
@@ -159,14 +159,14 @@ namespace GridWorld
         public ICommand runAway()
         {
             GridSquare enemy = getClosestEnemy();
-            Tuple<int, int> goHere = locationLocator.Retreat(enemy);
+            Tuple<int, int> goHere = locationLocator.Retreat(enemy, worldState.MyGridSquare);
             return urgentMove(goHere);
         }
 
         public ICommand engageEnemy()
         {
             return locationLocator.Attack(getClosestEnemy(),
-               getFacing(worldState.MyGridSquare), pathFinder);
+               getFacing(worldState.MyGridSquare), pathFinder, worldState.MyGridSquare);
         }
 
         public ICommand goToUnexplored()
