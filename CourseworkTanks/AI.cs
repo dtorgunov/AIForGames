@@ -71,7 +71,7 @@ namespace GridWorld
         private SubsumptionDispatch chooseBehaviour()
         {
             Random r = new Random();
-            int choise = r.Next(1);
+            int choise = r.Next(2);
             if (choise == 0)
             {
                 WriteTrace("Playing hunter");
@@ -220,8 +220,17 @@ namespace GridWorld
         public bool enemySighted()
         {
             GridSquare closestEnemy = getClosestEnemy();
-            // closest enemy refers to the closest VISIBLE enemy
-            return !(closestEnemy == null);
+            if (closestEnemy != null) {
+                // the path check is necessary as an enemy who shoots
+                // might be visible, but we will not be able to navigate
+                // towards it
+                List<GridNode> enemyPath = pathFinder.GetPathToTarget(
+                    new Tuple<int, int>(closestEnemy.X, closestEnemy.Y), worldState.MyGridSquare);
+
+                return enemyPath.Count > 1;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -230,8 +239,7 @@ namespace GridWorld
         /// <returns>True if the last surviving enemy is visible, false otherwise.</returns>
         public bool lastEnemySighted()
         {
-            GridSquare closestEnemy = getClosestEnemy();
-            return (!(closestEnemy == null)) && (enemyCount() == 1);
+            return enemySighted() && (enemyCount() == 1);
         }
 
         // Actions
@@ -262,8 +270,11 @@ namespace GridWorld
         /// <returns>The command to execute.</returns>
         public ICommand engageEnemy()
         {
-            return locationLocator.Attack(getClosestEnemy(),
-               getFacing(worldState.MyGridSquare), pathFinder, worldState.MyGridSquare);
+            GridSquare closestEnemy = getClosestEnemy();
+
+            Command navigateToEnemy = urgentMove(new Tuple<int, int>(closestEnemy.X, closestEnemy.Y));
+            return locationLocator.Attack(closestEnemy,
+               getFacing(worldState.MyGridSquare), navigateToEnemy, worldState.MyGridSquare);
         }
 
         /// <summary>
@@ -312,8 +323,13 @@ namespace GridWorld
             {
                 if (squaredDistance(tank, HeroTank) < cost)
                 {
-                    ApproxClosest = tank;
-                    cost = squaredDistance(tank, HeroTank);
+                    List<GridNode> path = pathFinder.GetPathToTarget(tank,
+                        worldState.MyGridSquare);
+                    if (path.Count > 1)
+                    {
+                        ApproxClosest = tank;
+                        cost = squaredDistance(tank, HeroTank);
+                    }
                 }
             }
             
