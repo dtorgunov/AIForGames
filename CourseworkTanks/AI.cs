@@ -78,7 +78,6 @@ namespace GridWorld
                 {
                     if (localMap[x, y] == Cell.Unexplored)
                     {
-                        WriteTrace("Unexplored node exists!");
                         return true;
                     }
                 }
@@ -121,6 +120,12 @@ namespace GridWorld
             return !(closestEnemy == null);
         }
 
+        public bool lastEnemySighted()
+        {
+            GridSquare closestEnemy = getClosestEnemy();
+            return (!(closestEnemy == null)) && (enemyCount() == 1);
+        }
+
         // Actions
 
         public ICommand stay()
@@ -144,7 +149,6 @@ namespace GridWorld
         public ICommand goToUnexplored()
         {
             Tuple<int, int> dest = locationLocator.UnexploredNode(worldState.MyGridSquare);
-            WriteTrace("Moving to " + dest.Item1 + "," + dest.Item2);
             return explorationMove(dest);
         }
 
@@ -288,7 +292,6 @@ namespace GridWorld
             GridSquare hero = worldState.MyGridSquare;
 
             GridNode nextMove = path.ElementAt(1);
-            WriteTrace("Next move: " + nextMove.x + "," + nextMove.y);
             if (nextMove.x > hero.X)
             {
                 return Command.Move.Right;
