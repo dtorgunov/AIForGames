@@ -19,7 +19,9 @@
       language=[Sharp]C,
       basicstyle=\small\ttfamily,
       flexiblecolumns=false,
-      basewidth={0.5em,0.45em}
+      basewidth={0.5em,0.45em},
+      breaklines=true,
+      postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}},
     }
 \usetikzlibrary{shapes,arrows,positioning}
 
@@ -298,6 +300,7 @@ Throughout this project's development, Github has been used in order to synchron
 Merge commits have been omitted from the log for brevity.
 
 \section{Source code}
+Please note that a curved red arrow indicates a linebreak not present in the original code, inserted for readibility.
 
 \subsection*{Tuple.cs}
 \begin{code}
