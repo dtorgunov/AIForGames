@@ -61,7 +61,7 @@ namespace GridWorld
                 }
             }
             this.pathFinder = new MightyPathFinder(localMap);
-            this.locationLocator = new LocationLocator(localMap, worldState.MyGridSquare, this.ID);
+            this.locationLocator = new LocationLocator(localMap, this.ID);
         }
 
         /// <summary>
@@ -252,7 +252,7 @@ namespace GridWorld
         public ICommand runAway()
         {
             GridSquare enemy = getClosestEnemy();
-            Tuple<int, int> goHere = locationLocator.Retreat(enemy);
+            Tuple<int, int> goHere = locationLocator.Retreat(enemy, worldState.MyGridSquare);
             return urgentMove(goHere);
         }
 
@@ -263,7 +263,7 @@ namespace GridWorld
         public ICommand engageEnemy()
         {
             return locationLocator.Attack(getClosestEnemy(),
-               getFacing(worldState.MyGridSquare), pathFinder);
+               getFacing(worldState.MyGridSquare), pathFinder, worldState.MyGridSquare);
         }
 
         /// <summary>

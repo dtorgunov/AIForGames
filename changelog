@@ -1,0 +1,339 @@
+commit 6520e7d0ea6ec4fca36d89ac4a17b2ed89b26fe6
+Merge: 9e19b7c 36fc777
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 13:26:08 2016 +0100
+
+    Merge remote-tracking branch 'origin/denis'
+
+commit 9e19b7c37011acc4255fae1f75206e77238867fd
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Wed May 11 12:25:12 2016 +0100
+
+    Create prototype for lookForTrouble()
+
+commit 36fc7771c109ef082aeb24794a21e75a34f494b7
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 12:17:30 2016 +0100
+
+    Create exploration prototype
+    
+    Need to further refine the "unexplored" chooser, possibly checking whether
+    a path to it exists. A few other issues seem to come up, but the most
+    likely culprit is that part of the code. Consider a better neighbours
+    criteria than just "not rock or unexplored", as well.
+
+commit c683171435beeb35bdeba0e1fee7955bde4987c5
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Wed May 11 09:41:09 2016 +0100
+
+    Optimise pathfinding and add testing code
+    
+    Changed the pathfinding code to be more streamlined and added a simple
+    action to find a path to a node in a straight line. Will further refine
+    shortly.
+
+commit c69b8ff018b708c9c326db7b2c4f260a4a1c7464
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Wed May 11 09:39:22 2016 +0100
+
+    Slim down GridNode
+    
+    Made GridNode more concise by removing superfluous getters/setters. Made
+    relevant changes in LocationLocator, in preparation to debug pathfinding.
+
+commit a3669cd2f2b0594bfca278f5e544399a69f2560c
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 07:19:17 2016 +0100
+
+    Prototype goToUnexplored() and UnexploredNode()
+    
+    Buggy version, crashes!
+    
+    So, certain assignements made the code not load, and an error loading
+    System only went away when I downgraded to 3.5. The only things I added
+    are Stack<> and IEquitable. Maybe the cause is the latter? Need to
+    double-check.
+    
+    In any case, BUGGY, CRASHES, needs fixing.
+
+commit ed8ed85b1a35d1193bb068b6b1520c37519a849c
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 04:47:09 2016 +0100
+
+    Implement runAway() and engageEnemy()
+    
+    Implemented 2 of the 3 actions needed for Explorer.
+    
+    George, wasn't sure what int id was referring to, set it to 0 for now,
+    please change as appropriate. Also, I think there are some things that
+    could do with abstracting as separate functions for readability, will
+    speak to you about it tomorrow.
+    
+    Also, when you set direction movement, I THINK you had Left and Right the
+    wrong way round (see diff for this commit), so I changed it. If, when you
+    guys are testing it, it turns out that I was wrong, you will also need to
+    make the same change to AI.directionToMove().
+    
+    Connor, look through your comments, some of them still refer to Snails.
+
+commit 2696af0a77abf5c94d9988c121562691ad3944c4
+Merge: 5bf8524 7e320a7
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 05:14:32 2016 +0100
+
+    Merge remote-tracking branch 'origin/george'
+
+commit 5bf85244757fd981142f1fa919bcdc8b2c214cb1
+Merge: e32ea4a 67da775
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 05:14:21 2016 +0100
+
+    Merge remote-tracking branch 'origin/connor'
+
+commit e32ea4a6db3685d069f500ff5e7e3d42e56b7dab
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 04:08:22 2016 +0100
+
+    Add enemiesExist() and enemySigted() predicates
+    
+    Added the two extra predicates necessary for Hunter.
+
+commit 4e5f290ae91b4da60bc04b2f97933602607843a1
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 04:03:24 2016 +0100
+
+    Reorder methods for redability
+    
+    Moved all the helper methods to the end of the class
+
+commit c74221e1c8ee5e179f11ceaf4dd1050993d09371
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Wed May 11 03:59:40 2016 +0100
+
+    Implement seenByEnemy()
+    
+    Added the implementation of the seenByEnemy() method. At the moment it
+    looks at the closest enemy only, but perhaps we could iterate through all
+    enemies instead? Shouldn't be too hard to do, will probably implement
+    tomorrow.
+
+commit 67da775d1dc3ed51231844eea06ebcf67a923c42
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Tue May 10 21:54:18 2016 +0100
+
+    Update A* Logic
+
+commit fc6081b59fcf858bd0ca0de35da2029bbfed33fe
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Tue May 10 20:51:41 2016 +0100
+
+    Add heuristic, update Gridnode methods
+
+commit 7e320a7abc7ca7d850f8d28fb83ed36a713caa47
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 20:39:07 2016 +0100
+
+    Can now move to attack positions.
+
+commit bfb9eb7b2dd2d41e2c66276fe36311319acf3af1
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 20:20:07 2016 +0100
+
+    No longer crashes when hiding near the edge.
+
+commit f378b3650e60d7236bbfb98f8f4765dea7ad922d
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Tue May 10 20:19:53 2016 +0100
+
+    Update pathfinding class contructors
+
+commit 8e841eb65ca59884dec0eed98d198fdad9170135
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 20:16:57 2016 +0100
+
+    Outline the seenByEnemy() method
+    
+    Only adds the "skeleton" of the method, the code to detect the enemy's
+    position is facing has not been added yet.
+
+commit 15617bd1742ea0fdafd4de065d1513fe2bb9cec1
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 19:05:37 2016 +0100
+
+    Add conversion from Cell[,] back to GridSquare[,]
+    
+    Needed to determine whether an enemy tank can see us or not.
+
+commit 62ae13e3de63ebb64942c1d387e851b3cd4a30fa
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 19:03:16 2016 +0100
+
+    Basic cardinal attack functionality.
+
+commit a95cd6858b3fed082e39890e442bc89a07862803
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 18:41:37 2016 +0100
+
+    Add the first couple of predicates
+    
+    Does not yet account for the "visible by enemy" predicate.
+    
+    Moreover, the implementations are not exactly efficient, searching through
+    the whole local map in the worst case. Consider the impact on running
+    time!
+
+commit 50a16f886c5849a467326bc7cdfcb8aa3143cfdb
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 18:30:07 2016 +0100
+
+    Advanced hiding mechanics.
+
+commit 983b2db093eb543c2ccf81070a823e550a5ea51d
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 17:51:11 2016 +0100
+
+    Basic cardinal direction cover checking
+
+commit 965bf83a7478fad4df841a62f6937317cf9ef771
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 16:47:46 2016 +0100
+
+    Changed List to GridNode.
+
+commit 1797f8faa86a1521f15063dabffb87053e08f7e0
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 16:30:52 2016 +0100
+
+    Added RandomUnkown method.
+
+commit 34d4cd0a5bc09297bbab14a81e641ee877dbb0ae
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 16:26:39 2016 +0100
+
+    Added code to regenerate a larger map if it is empty.
+
+commit 2e92c30339bc682bb55b56c686a935c5ab2efc53
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 16:02:37 2016 +0100
+
+    Made list generation a seperate method.
+
+commit 3c858e29636913007091be8aa79bf92f5cf1ca27
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 15:55:08 2016 +0100
+
+    Added list of nearby rocks.
+
+commit cedf70913f4ab515f22e5d9e99ea5354b6b3ab76
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 15:51:05 2016 +0100
+
+    Seperated RandomKnown to a seperate method.
+
+commit 7fc751eb25e2e9f1db915460a47fa1b613af4707
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 15:33:44 2016 +0100
+
+    Added the RandomDodge method.
+
+commit 1ca0096737b84946b64e4c6b6954447b2aec23d8
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 14:49:01 2016 +0100
+
+    Added return type and base case to Retreat method.
+
+commit 252eca1230500a3d4e0e37b7d885f7ef62d431fb
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 14:41:28 2016 +0100
+
+    Added GridSquare for player.
+
+commit cc36167f3af790216d216f3fd76d800cddb6aa27
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 14:35:49 2016 +0100
+
+    Basic framework added to LocationLocator.
+
+commit 0e68f3cfb74781d0445a2a2a964a2032df9739a7
+Author: George Bell <george@cattlebell.com>
+Date:   Tue May 10 14:22:52 2016 +0100
+
+    LocationLocator created.
+
+commit 7d0a6d6594aba0cbd42dae8e8e2212f2cf594d58
+Merge: 4eb90e4 ccdbb64
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 02:55:48 2016 +0100
+
+    Merge remote-tracking branch 'origin/denis'
+
+commit ccdbb640b73944fd63ef7a8b1e9d3d342cfb3c48
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 02:51:37 2016 +0100
+
+    Add the dispatcher to the main class
+    
+    The dispatcher now takes care of executing an action. At the moment, only
+    the default action is specified, to allow for testing.
+
+commit defbd1f9089c244bb512bc8bb425191e9689d6f6
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 02:39:25 2016 +0100
+
+    Create a copy of the Tuple class
+    
+    The standard C# tuple class could not be loaded by GridWorld, so an
+    implementation with a similar interface has been provided, instead.
+
+commit 3f286e881a74a56a5bfb027aea1f62d122f4a93d
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 02:37:01 2016 +0100
+
+    Add an (inefficient) way of converting the map
+    
+    This converts the currently visible map to a Cell array. Note that the
+    implementation is not meant to be effcient, and is simply there to allow
+    the others to develop the rest of the necessary methods.
+
+commit 4eb90e4c34991ac63371d76592e986dae9438674
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Tue May 10 02:18:54 2016 +0100
+
+    Add Tiles enum and create function prototypes
+
+commit 610bb882bf7d28886d11975129994819ffa28527
+Author: Connor Aspinall <piefacevian@googlemail.com>
+Date:   Tue May 10 01:54:34 2016 +0100
+
+    Add pathfinding classes
+
+commit 65bfde2efd39440dc65996fd9e9479ebf0126f96
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 01:15:15 2016 +0100
+
+    Create README.md
+
+commit 45fa195910765b3ee28cccc222cc48459c645831
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 01:06:07 2016 +0100
+
+    Add the subsumption dispatcher class
+    
+    Made the class an inner class of the main class, just to make
+    it easier to manage, and as I was not sure how multiclass things
+    would work in a "class library" setting.
+
+commit 8a333f3298a8192c02622dd5a7ceb487c769929c
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 00:37:57 2016 +0100
+
+    Initial commit
+    
+    Added the basic file struture and a working, if simple, AI
+    that just moves upwards.
+
+commit c11f111cc40c51f397898f27118c6d86e029718e
+Author: Denis Torgunov <dtorgunov@leafonthewind.net>
+Date:   Tue May 10 00:19:01 2016 +0100
+
+    Initial commit

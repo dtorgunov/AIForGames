@@ -9,7 +9,6 @@ namespace GridWorld
     {
 
         private Cell[,] localMap;
-        private GridSquare hero;
         private int id;
 
         private Tuple<int, int> unexplored;
@@ -18,24 +17,21 @@ namespace GridWorld
         /// Constructs the class.
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
-        /// <param name="hero">Location of the player.</param>
         /// <param name="id">The ID of the player.</param>
-        public LocationLocator(Cell[,] localMap, GridSquare hero, int id)
+        public LocationLocator(Cell[,] localMap,  int id)
         {
             this.unexplored = null;
-            Update(localMap, hero, id);
+            Update(localMap, id);
         }
 
         /// <summary>
         /// Updates the localMap
         /// </summary>
         /// <param name="localMap">Map of the game environment.</param>
-        /// <param name="hero">Location of the player.</param>
         /// <param name="id">The ID of the player.</param>
-        public void Update(Cell[,] localMap, GridSquare hero, int id)
+        public void Update(Cell[,] localMap,  int id)
         {
             this.localMap = localMap;
-            this.hero = hero;
             this.id = id;
         }
 
@@ -43,24 +39,25 @@ namespace GridWorld
         /// Gives a location to locate to.
         /// </summary>
         /// <param name="threat">The threat to retreat from.</param>
+        /// <param name="hero">The player</param>
         /// <returns>A Tuple with the coordinates of the destination.</returns>
-        public Tuple<int, int> Retreat(GridSquare threat)
+        public Tuple<int, int> Retreat(GridSquare threat, GridSquare hero)
         {
             int mapWidth = localMap.GetLength(0);
             int mapHeigth = localMap.GetLength(1);
 
             int searchSize = 1;
-            List<GridNode> obs = MapObs(searchSize);
+            List<GridNode> obs = MapObs(searchSize, hero);
 
             while(obs.Count == 0) 
             {
                 if (searchSize < 3)
                 {
                     searchSize++;
-                    obs = MapObs(searchSize);
+                    obs = MapObs(searchSize, hero);
                 }
                 else
-                    return RandomDodge(mapWidth, mapHeigth, threat);
+                    return RandomDodge(mapWidth, mapHeigth, threat, hero);
             }
 
             foreach (GridNode gn in obs)
@@ -74,20 +71,20 @@ namespace GridWorld
                     if (gn.y < mapWidth)
                         if (localMap[gn.x, gn.y + 1] == Cell.Empty)
                             return new Tuple<int, int>(gn.x, gn.y + 1);
-                        else if (AdvancedDodge(gn).Item1 != -1)
-                            return AdvancedDodge(gn);
+                        else if (AdvancedDodge(gn, hero).Item1 != -1)
+                            return AdvancedDodge(gn, hero);
                 }
                 else if (gn.y < hero.Y)
                 {
                     if (gn.y > 0)
                         if (localMap[gn.x, gn.y - 1] == Cell.Empty)
                             return new Tuple<int, int>(gn.x, gn.y + 1);
-                        else if (AdvancedDodge(gn).Item1 != -1)
-                            return AdvancedDodge(gn);
+                        else if (AdvancedDodge(gn, hero).Item1 != -1)
+                            return AdvancedDodge(gn, hero);
                 }
             }
 
-            return RandomDodge(mapWidth, mapHeigth, threat);
+            return RandomDodge(mapWidth, mapHeigth, threat, hero);
         }
 
         /// <summary>
@@ -132,8 +129,9 @@ namespace GridWorld
         /// Checks if cover either above or below the player can be hidden behind on the X-axis.
         /// </summary>
         /// <param name="gn">The GridNode to hide behind.</param>
+        /// <param name="hero">The player location</param>
         /// <returns>A Tuple to move to. Will contain -1, -1 if not valid.</returns>
-        private Tuple<int, int> AdvancedDodge(GridNode gn)
+        private Tuple<int, int> AdvancedDodge(GridNode gn, GridSquare hero)
         {
             if (gn.x > hero.X)
             {
@@ -155,8 +153,9 @@ namespace GridWorld
         /// Maps the obstacles surronding the player.
         /// </summary>
         /// <param name="size">How far away from the player to go.</param>
+        /// <param name="hero">The player location</param>
         /// <returns>A list of the nearby obstacles.</returns>
-        private List<GridNode> MapObs(int size)
+        private List<GridNode> MapObs(int size, GridSquare hero)
         {
             List<GridNode> obs = new List<GridNode>();
 
@@ -178,8 +177,9 @@ namespace GridWorld
         /// <param name="w">The width of the board.</param>
         /// <param name="h">The height of the board.</param>
         /// <param name="t">The target to escape from.</param>
+        /// <param name="hero">The player location</param>
         /// <returns>A Tuple with the coordinates of the destination.</returns>
-        private Tuple<int, int> RandomDodge(int w, int h, GridSquare t)
+        private Tuple<int, int> RandomDodge(int w, int h, GridSquare t, GridSquare hero)
         {
             Random r = new Random();
             
@@ -196,9 +196,9 @@ namespace GridWorld
                 yDiff = Math.Abs(t.Y - hero.Y);
 
             if (xDiff < yDiff)          //Closer on the x-axis, dodge vertically
-                return Dodge(0, 1);
+                return Dodge(0, 1, hero);
             else                        //Closer on the y-axis, dodge horizontally
-                return Dodge(1, 0);
+                return Dodge(1, 0, hero);
         }
 
         /// <summary>
@@ -206,8 +206,9 @@ namespace GridWorld
         /// </summary>
         /// <param name="xAdd">How far to look in the X-direction.</param>
         /// <param name="yAdd">How far to look in the Y-direction.</param>
+        /// <param name="hero">The player location.</param>
         /// <returns>A Tuple with the coordinates of the destination.</returns>
-        private Tuple<int, int> Dodge(int xAdd, int yAdd)
+        private Tuple<int, int> Dodge(int xAdd, int yAdd, GridSquare hero)
         {
             Random r = new Random();
             if (localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Rock && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Rock && localMap[hero.X + xAdd, hero.Y + yAdd] != Cell.Destroyed && localMap[hero.X - xAdd, hero.Y - yAdd] != Cell.Destroyed)
@@ -230,9 +231,10 @@ namespace GridWorld
         /// </summary>
         /// <param name="threat">The enemy to attack</param>
         /// <param name="facing">The direction the player is facing.</param>
-        /// <param name="mpf">The pathfinder.</param>
+        /// <param name="toEnemy">The pathfinder.</param>
+        /// <param name="hero">The player location</param>
         /// <returns>The issued command.</returns>
-        public Command Attack(GridSquare threat, PlayerWorldState.Facing facing, MightyPathFinder mpf) 
+        public Command Attack(GridSquare threat, PlayerWorldState.Facing facing, Command toEnemy, GridSquare hero) 
         {
             if (hero.X == threat.X)
             {
@@ -249,16 +251,7 @@ namespace GridWorld
                     return AttackFacing(facing, PlayerWorldState.Facing.Right, PlayerWorldState.Facing.Up, PlayerWorldState.Facing.Down);
             }
 
-            GridNode travel = mpf.GetPathToTarget(new Tuple<int, int>(threat.X, threat.Y), hero).ElementAt(0);
-
-            if (travel.x > hero.X)
-                return new Command(Command.Move.Right, false);
-            else if (travel.x < hero.X)
-                return new Command(Command.Move.Left, false);
-            else if (travel.y > hero.Y)
-                return new Command(Command.Move.Up, false);
-            else
-                return new Command(Command.Move.Down, false);
+            return toEnemy;
             
         }
 
