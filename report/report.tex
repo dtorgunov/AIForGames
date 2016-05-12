@@ -242,10 +242,10 @@ The key action from the Hunter profile (Figure~\ref{fig:hunter}) is to find and 
 \begin{itemize}
 \item The \verb|GridSquare| that contains the opponent to attack.
 \item A \verb|PlayerWorldState.Facing| that represents the direction the AI is facing.
-\item The \verb|MightyPathFinder| is used by the AI to path to locations.
+\item The \verb|Command| to be executed if the opponent cannot be attacked directly.
 \end{itemize}
 
-To begin with, the method calculates if it is possible to kill the opponent this turn, proceeding to do so if it is possible. This is achieved by checking if the AI and the opponent share either an X or a Y coordinate. If they do, then the AI calculates whether the tank is currently facing the opponent, before either attacking, or rotating and then attacking the given opponent. If this is not the case, then the pathfinder is used, which generates a path for the AI to follow towards the opponent. As the tank can only move in four directions, and cannot shoot diagonally, this ensures that the tank will reach a point from which it can attack the given enemy.
+To begin with, the method calculates if it is possible to kill the opponent this turn, proceeding to do so if it is possible. This is achieved by checking if the AI and the opponent share either an X or a Y coordinate. If they do, then the AI calculates whether the tank is currently facing the opponent, before either attacking, or rotating and then attacking the given opponent. If this is not the case, then the \verb|Command| is returned, which is part of a path for the AI to follow towards the opponent. As the tank can only move in four directions, and cannot shoot diagonally, this ensures that the tank will reach a point from which it can attack the given enemy.
 
 \section{Testing and Tuning}
 
