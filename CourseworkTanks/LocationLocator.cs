@@ -304,26 +304,23 @@ namespace GridWorld
             return new Tuple<int, int>(x, y);
         }
 
-        /// <summary>
-        /// Gives a random unknown node to path to.
-        /// </summary>
-        /// <param name="w">The width of the board.</param>
-        /// <param name="h">The height of the board.</param>
-        /// <returns>A Tuple with the coordinates of the destination.</returns>
-        public Tuple<int, int> RandomUnknown(int w, int h)
+        public Tuple<int, int> RandomReachable(GridSquare hero)
         {
-            Random r = new Random();
-            Cell c;
-            int x;
-            int y;
-            do
-            {
-                x = r.Next(w);
-                y = r.Next(h);
-                c = localMap[w, h];
-            } while (c != Cell.Unexplored);
+            List<Tuple<int, int>> reachableCells = ReachableUnexplored(hero);
 
-            return new Tuple<int, int>(x, y);
+            for (int x = 0; x < localMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < localMap.GetLength(1); y++)
+                {
+                    if (localMap[x, y] == Cell.Empty || localMap[x, y] == Cell.Hero)
+                    {
+                        reachableCells.Add(new Tuple<int, int>(x, y));
+                    }
+                }
+            }
+
+            Random r = new Random();
+            return reachableCells.ElementAt(r.Next(reachableCells.Count));
         }
 
         public Tuple<int, int> UnexploredNode(GridSquare hero)
@@ -347,6 +344,19 @@ namespace GridWorld
         /// </summary>
         /// <param name="hero">The player's position</param>
         private void SetUnexploredNode(GridSquare hero)
+        {
+            List<Tuple<int, int>> unexplored = ReachableUnexplored(hero);
+
+            if (unexplored.Count == 0)
+            {
+                this.unexplored = null;
+            }
+
+            Random r = new Random();
+            this.unexplored = unexplored.ElementAt(r.Next(unexplored.Count));
+        }
+
+        private List<Tuple<int, int>> ReachableUnexplored(GridSquare hero)
         {
             List<Tuple<int, int>> checkedList = new List<Tuple<int, int>>();
             List<Tuple<int, int>> unexplored = new List<Tuple<int, int>>();
@@ -374,7 +384,7 @@ namespace GridWorld
                 }
                 else
                 {
-                    unexplored.Add(current);  
+                    unexplored.Add(current);
                 }
 
                 List<Tuple<int, int>> neightbours = GetNodeNeighbours(current);
@@ -389,13 +399,7 @@ namespace GridWorld
                 }
             }
 
-            if (unexplored.Count == 0)
-            {
-                this.unexplored = null;
-            }
-
-            Random r = new Random();
-            this.unexplored = unexplored.ElementAt(r.Next(unexplored.Count));
+            return unexplored;
         }
 
         /// <summary>

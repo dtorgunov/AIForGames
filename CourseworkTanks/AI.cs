@@ -169,20 +169,27 @@ namespace GridWorld
                     }
                 }
             }
-                int cost = int.MaxValue;
-                Tuple<int, int> ApproxClosest = null;
-                Tuple<int, int> HeroTank = new Tuple<int, int>(worldState.MyGridSquare.X, worldState.MyGridSquare.Y);
+            
+            int cost = int.MaxValue;
+            Tuple<int, int> ApproxClosest = null;
+            Tuple<int, int> HeroTank = new Tuple<int, int>(worldState.MyGridSquare.X, worldState.MyGridSquare.Y);
 
-                foreach (var tank in Enemies)
+            foreach (var tank in Enemies)
+            {
+                if (squaredDistance(tank, HeroTank) < cost)
                 {
-                    if (squaredDistance(tank, HeroTank) < cost)
-                    {
-                        ApproxClosest = tank;
-                        cost = squaredDistance(tank, HeroTank);
-                    }
+                    ApproxClosest = tank;
+                    cost = squaredDistance(tank, HeroTank);
                 }
-
+            }
+            
+            if (ApproxClosest != null)
+            {
                 return explorationMove(ApproxClosest);
+            }
+
+            // no known enemy locations, move to a random reachable cell
+            return explorationMove(locationLocator.RandomReachable(worldState.MyGridSquare));
         }
 
         
