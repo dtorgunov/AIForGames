@@ -392,7 +392,7 @@ using System.Text;
 
 namespace GridWorld
 {
-    class Tuple<T1, T2> //: IEquatable<Tuple<T1, T2>>
+    class Tuple<T1, T2> 
     {
         public T1 Item1;
         public T2 Item2;
@@ -1148,8 +1148,7 @@ namespace GridWorld
         {
             List<Tuple<int, int>> neighbours = new List<Tuple<int, int>>();
 
-            //if (localMap[node.Item1, node.Item2] != Cell.Unexplored
-            // && localMap[node.Item1, node.Item2] != Cell.Rock)
+           
             if(!potentialWall(node))
             {
                 Stack<Tuple<int, int>> potentialNeighbours
@@ -1669,7 +1668,7 @@ namespace GridWorld
             playerNumber = hero.Player;
             List<GridSquare> visibleMap = worldState.MyVisibleSquares;
 
-            localMap[hero.X, hero.Y] = Cell.Hero; // NEED TO CLEAR OLD LOCATION
+            localMap[hero.X, hero.Y] = Cell.Hero;
 
             Tuple<int, int> e1 = new Tuple<int, int>(-1, -1);
             Tuple<int, int> e2 = new Tuple<int, int>(-1, -1);
