@@ -11,6 +11,11 @@ namespace GridWorld
         Cell[,] InternalCellMap;
         GridNode Hero;
 
+
+        /// <summary>
+        /// Construct class and initialise internal map representatives.
+        /// </summary>
+        /// <param name="ICM">Local Cell Map.</param>
         public MightyPathFinder(Cell[,] ICM)
         {
             this.InternalCellMap = ICM;
@@ -18,6 +23,11 @@ namespace GridWorld
             
         }
 
+       
+        /// <summary>
+        /// Convert from Cell[,] to GridNode[,] and intialises internal node map.
+        /// </summary>
+        /// <param name="ICM">Local Cell Map.</param>
         public void ConvertToGridNodeArray(Cell[,] ICM)
         {
             InternalNodeMap = new GridNode[InternalCellMap.GetLength(0),InternalCellMap.GetLength(1)];
@@ -36,15 +46,15 @@ namespace GridWorld
             }
         }
 
+        /// <summary>
+        /// Return the horizontal and vertical neighbouring nodes of a given node. 
+        /// </summary>
+        /// <param name="node"> The current node.</param>
+        /// <param name="target">The target node.</param>
+        /// <returns>Return a list of all found neigbours(if any).</returns>
+
         private List<GridNode> GetNeighbours(GridNode node, GridNode target)
         {
-
-            // to account for impassable cells, we say that an unwalkable cell has no neighbours
-            // therefore it will never be part of a path, other than as the goal
-            /*if (!node.walkable)
-            {
-                return new List<GridNode>();
-            }*/
 
             List<GridNode> neighbours = new List<GridNode>();
 
@@ -72,6 +82,11 @@ namespace GridWorld
             }
             return neighbours;
         }
+        /// <summary>
+        /// Check if an unexplored node is traversable.
+        /// </summary>
+        /// <param name="node"> Node to be checked.</param>
+        /// <returns>'True' if Traversable, 'False' otherwise.</returns>
 
         private bool reachableUnexplored(GridNode node)
         {
@@ -107,6 +122,12 @@ namespace GridWorld
             }
         }
 
+        /// <summary>
+        /// Check if vector position is contained on the map.
+        /// </summary>
+        /// <param name="coor">Position.</param>
+        /// <returns></returns>
+
         private bool IsValidCoordinate(Tuple<int, int> coor)
         {
             if (coor.Item1 < 0 || coor.Item2 < 0)
@@ -123,6 +144,12 @@ namespace GridWorld
             return true;
         }
 
+        /// <summary>
+        /// Return Matthatten heuristic value of cost for moving from one space to an adjacent space.
+        /// </summary>
+        /// <param name="node">The Current Node</param>
+        /// <param name="goal">The Target Node</param>
+        /// <returns>Computed cost</returns>
         private int heuristic(GridNode node, GridNode goal)
         {
             int dx = Math.Abs(node.x - goal.x);
@@ -130,7 +157,12 @@ namespace GridWorld
 
             return dx + dy;
         }
-
+        /// <summary>
+        /// Gets the shortest path between two given node positions. 
+        /// </summary>
+        /// <param name="TupleNode">Target node position</param>
+        /// <param name="heroPos"> Starting node position</param>
+        /// <returns> List of path nodes</returns>
 
         public List<GridNode> GetPathToTarget(Tuple<int, int> TupleNode, GridSquare heroPos){
 
