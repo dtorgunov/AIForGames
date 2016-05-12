@@ -510,6 +510,17 @@ namespace GridWorld
             List<GridNode> path = pathFinder.GetPathToTarget(destination, worldState.MyGridSquare);
             GridSquare hero = worldState.MyGridSquare;
 
+            // sometimes the enemy comes into the only possible path and we cannot move
+            // in those cases, change destination
+
+            if (path.Count < 1)
+            {
+                //return Command.Move.Stay;
+                locationLocator.RefreshUnexplored();
+                Tuple<int, int> newDestination = locationLocator.UnexploredNode(hero);
+                path = pathFinder.GetPathToTarget(newDestination, worldState.MyGridSquare);
+            }
+
             GridNode nextMove = path.ElementAt(1);
             if (nextMove.x > hero.X)
             {

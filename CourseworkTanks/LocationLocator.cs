@@ -297,6 +297,11 @@ namespace GridWorld
             return new Tuple<int, int>(x, y);
         }
 
+        /// <summary>
+        /// Find a random cell that we can reach from our current position.
+        /// </summary>
+        /// <param name="hero">Our current position.</param>
+        /// <returns>A reachable cell.</returns>
         public Tuple<int, int> RandomReachable(GridSquare hero)
         {
             List<Tuple<int, int>> reachableCells = ReachableUnexplored(hero);
@@ -317,6 +322,21 @@ namespace GridWorld
             return reachableCells.ElementAt(r.Next(reachableCells.Count));
         }
 
+        /// <summary>
+        /// Refresh the current target unexplored location. Needed in case our path gets blocked off.
+        /// </summary>
+        public void RefreshUnexplored()
+        {
+            unexplored = null;
+        }
+
+        /// <summary>
+        /// Return an unexplored node reachable from our current position.
+        /// The node is cached until it ceases being unexplored or is refreshed,
+        /// to ensure consistency.
+        /// </summary>
+        /// <param name="hero">Our current position.</param>
+        /// <returns>A reachable unexplored node.</returns>
         public Tuple<int, int> UnexploredNode(GridSquare hero)
         {
             if (unexplored == null)
@@ -350,6 +370,11 @@ namespace GridWorld
             this.unexplored = unexplored.ElementAt(r.Next(unexplored.Count));
         }
 
+        /// <summary>
+        /// Determine all unexplored nodes reachable from our current position.
+        /// </summary>
+        /// <param name="hero">Our current position.</param>
+        /// <returns>A list of all reachable unexplored nodes.</returns>
         private List<Tuple<int, int>> ReachableUnexplored(GridSquare hero)
         {
             List<Tuple<int, int>> checkedList = new List<Tuple<int, int>>();
